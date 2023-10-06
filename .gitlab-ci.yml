@@ -8,6 +8,6 @@ deploy:
   environment:
     name: production
   only:
-    - master
+    - main
   script:
-    - git-push master --force
+    - git-push main
