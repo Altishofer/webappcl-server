@@ -1,0 +1,13 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  tags:
+    - deploy-ltwa
+  environment:
+    name: production
+  only:
+    - master
+  script:
+    - git-push master
