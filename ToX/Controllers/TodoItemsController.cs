@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,10 +24,18 @@ namespace ToX.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
-          if (_context.TodoItems == null)
-          {
-              return NotFound();
-          }
+            try
+            {
+                _context.Database.OpenConnection();
+            }
+            catch (Exception ex)
+            {
+                return Content("Database connection failed: " + ex.Message); 
+            }
+            if (_context.TodoItems == null)
+            {
+                return NotFound();
+            }
             return await _context.TodoItems.ToListAsync();
         }
 
@@ -35,10 +43,10 @@ namespace ToX.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
-          if (_context.TodoItems == null)
-          {
-              return NotFound();
-          }
+            if (_context.TodoItems == null)
+            {
+                return NotFound();
+            }
             var todoItem = await _context.TodoItems.FindAsync(id);
 
             if (todoItem == null)
@@ -50,7 +58,6 @@ namespace ToX.Controllers
         }
 
         // PUT: api/TodoItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
         {
