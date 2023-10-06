@@ -19,6 +19,13 @@ namespace ToX.Controllers
         {
             _context = context;
         }
+        
+        // GET: api/TodoItems
+        [HttpGet("status")]
+        public ActionResult  GetStatus()
+        { 
+            return Ok("Server is up and running");
+        }
 
         // GET: api/TodoItems
         [HttpGet]
@@ -32,11 +39,11 @@ namespace ToX.Controllers
             {
                 return Content("Database connection failed: " + ex.Message); 
             }
-            if (_context.TodoItems == null)
-            {
-                return NotFound();
-            }
-            return await _context.TodoItems.ToListAsync();
+              if (_context.TodoItems == null)
+              {
+                  return NotFound();
+              }
+              return await _context.TodoItems.ToListAsync();
         }
 
         // GET: api/TodoItems/5
