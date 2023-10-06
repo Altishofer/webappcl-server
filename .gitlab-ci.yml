@@ -10,5 +10,5 @@ deploy:
   only:
     - main
   script:
-  #  - git-push master
-  - git push --force dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID HEAD:refs/heads/main
+    - git-push main
+  #- git push --force dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID HEAD:refs/heads/main
