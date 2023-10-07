@@ -1,31 +1,39 @@
+using System;
+using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using ToX.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+using ToX.Models;
+using dotenv.net;
+
+DotEnv.Fluent()
+    .WithExceptions()
+    .WithEnvFiles(Path.Combine("..", ".env"))
+    .WithTrimValues()
+    .WithDefaultEncoding()
+    .WithoutOverwriteExistingVars()
+    .WithoutProbeForEnv()
+    .Load();
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-builder.Configuration.AddUserSecrets<Program>();
-builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationContext>(options =>
 {
-    var connectionStringBuilder = new NpgsqlConnectionStringBuilder();
-    var configuration = builder.Configuration;
+    var connectionStringBuilder = new NpgsqlConnectionStringBuilder
+    {
+        Host = Environment.GetEnvironmentVariable("DB_HOST"),
+        Port = int.Parse(Environment.GetEnvironmentVariable("DB_PORT")),
+        Database = Environment.GetEnvironmentVariable("DB_NAME"),
+        Username = Environment.GetEnvironmentVariable("DB_USER"),
+        Password = Environment.GetEnvironmentVariable("DB_PASSWORD")
+    };
 
-    connectionStringBuilder.Host = configuration["DB_HOST"];
-    connectionStringBuilder.Port = int.Parse(configuration["DB_PORT"]);
-    connectionStringBuilder.Database = configuration["DB_NAME"];
-    connectionStringBuilder.Username = configuration["DB_USER"];
-    connectionStringBuilder.Password = configuration["DB_PASSWORD"];
     options.UseNpgsql(connectionStringBuilder.ConnectionString);
-    
+
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     options.EnableSensitiveDataLogging();
     options.EnableDetailedErrors();
@@ -40,9 +48,9 @@ builder.Services.AddAuthentication(x =>
 {
     x.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"])),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_SETTINGS_ISSUER"),
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_SETTINGS_AUDIENCE"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SETTINGS_KEY"))),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -50,7 +58,6 @@ builder.Services.AddAuthentication(x =>
     };
 }));
 builder.Services.AddAuthorizationCore();
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

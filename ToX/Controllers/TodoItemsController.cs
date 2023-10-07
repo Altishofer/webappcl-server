@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using dotenv.net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToX.Models;
+using dotenv.net;
 
 namespace ToX.Controllers
 {
@@ -24,7 +26,7 @@ namespace ToX.Controllers
         [HttpGet("status")]
         public ActionResult  GetStatus()
         { 
-            return Ok("Server is up and running");
+            return Ok("Server is up and running? ->");
         }
 
         // GET: api/TodoItems
