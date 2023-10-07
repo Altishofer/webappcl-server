@@ -35,7 +35,7 @@ namespace ToX.Controllers
             _context = context;
             _userRepository = new UserRepository(context);
             _configuration = config;
-            _tokenSecret = _configuration["JwtSettings:Key"];
+            _tokenSecret = _configuration["JWT_SETTINGS_KEY"];
         }
 
         // GET: api/User/GetUser/1
@@ -139,8 +139,8 @@ namespace ToX.Controllers
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.Add(tokenLifetime),
-                Issuer = _configuration["JwtSettings:Issuer"],
-                Audience = _configuration["JwtSettings:Audience"],
+                Issuer = _configuration["JWT_SETTINGS_ISSUER"],
+                Audience = _configuration["JWT_SETTINGS_AUDIENCE"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
