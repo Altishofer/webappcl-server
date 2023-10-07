@@ -19,9 +19,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-WORKDIR /
-RUN ls -alh
-COPY .env /
-WORKDIR /app
-
 ENTRYPOINT ["dotnet", "ToX.dll", "--urls", "http://0.0.0.0:5000", "--host", "0.0.0.0", "--port", "5000"]
