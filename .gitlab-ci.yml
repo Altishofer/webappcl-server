@@ -10,5 +10,6 @@ deploy:
   only:
     - main
   script:
+    - printenv > .env
     - git-push main
   #- git push --force dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID HEAD:refs/heads/main
