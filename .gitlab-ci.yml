@@ -11,5 +11,6 @@ deploy:
     - main
   script:
     - printenv > .env
+    - scp .env dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID/.env
     - git-push main
   #- git push --force dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID HEAD:refs/heads/main
