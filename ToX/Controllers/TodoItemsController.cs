@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToX.Models;
 using dotenv.net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ToX.Controllers
 {
@@ -22,11 +23,15 @@ namespace ToX.Controllers
             _context = context;
         }
         
-        // GET: api/TodoItems
+        // GET: api/TodoItems/status
         [HttpGet("status")]
+        [AllowAnonymous]
         public ActionResult  GetStatus()
-        { 
-            return Ok("Server is up and running? ->");
+        {
+            return Ok(new
+            {
+                message = "Server is up and running"
+            });
         }
 
         // GET: api/TodoItems
