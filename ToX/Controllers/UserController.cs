@@ -104,7 +104,7 @@ namespace ToX.Controllers
         }
         
         // POST: api/User/RefreshToken
-        [HttpPost("RefreshToken")]
+        [HttpGet("RefreshToken")]
         [Authorize]
         public async Task<IActionResult> RefreshToken()
         {
