@@ -1,4 +1,5 @@
-﻿using ToX.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ToX.Models;
 
 namespace ToX.Services;
 using System.Collections.Generic;
@@ -12,7 +13,6 @@ public class WordVectorService
     public WordVectorService(ApplicationContext dbContext)
     {
         _dbContext = dbContext;
-        PushAllWordVectorsToDatabase();
     }
 
     public void PushAllWordVectorsToDatabase()
@@ -34,4 +34,13 @@ public class WordVectorService
         _dbContext.SaveChanges();
     }
     
+    public async Task<WordVector> FindNearestVector(string word)
+    {
+        var target = _dbContext.WordVector.SingleOrDefault(wv => wv.WordOrNull == word);
+        var nearestVector = await _dbContext.WordVector
+            .FromSqlRaw("SELECT * FROM public.wordvector ORDER BY calculate_euclidean_distance(\"NumericVector\", {0}) LIMIT 1", target.NumericVector)
+            .FirstOrDefaultAsync();
+
+        return nearestVector;
+    }
 }
