@@ -80,6 +80,7 @@ _[Ss]cripts
 *.bin
 .vs/
 .idea/
+!GoogleNews-vectors-negative300.bin
 ######################
 # environment
 ######################
