@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using ToX.Models;
 using ToX.Services;
 
 namespace ToX.Controllers
@@ -9,10 +10,13 @@ namespace ToX.Controllers
     public class Word2VectorController : ControllerBase
     {
         private readonly Word2VectorService _word2VectorService;
+        private readonly ApplicationContext _context;
 
-        public Word2VectorController()
+        public Word2VectorController(ApplicationContext applicationContext)
         {
-            _word2VectorService = new Word2VectorService();
+            _word2VectorService = new Word2VectorService(applicationContext);
+            _context = applicationContext;
+            _word2VectorService.PrintModelInfo();
         }
 
         [HttpGet("modelInfo")]

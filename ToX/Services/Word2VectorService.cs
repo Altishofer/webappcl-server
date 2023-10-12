@@ -7,10 +7,12 @@ using Word2vec.Tools;
 public class Word2VectorService
 {
     private readonly Vocabulary _vocabulary;
+    private readonly ApplicationContext _context;
 
-    public Word2VectorService()
+    public Word2VectorService(ApplicationContext applicationContext)
     {
         _vocabulary = new Word2VecBinaryReader().Read(Path.GetFullPath("./GoogleNews-vectors-negative300.bin"));
+        _context = applicationContext;
     }
 
     public void PrintModelInfo()
