@@ -41,16 +41,16 @@ namespace ToX.Controllers
         }
 
         [HttpGet("wordAddition")]
-        public async Task<IActionResult> GetWordAddition(string wordA, string wordB, int count)
+        public async Task<IActionResult> GetWordAddition(string wordA, string wordB)
         {
-            var additionWords = await _word2VectorService.WordAdditionAsync(wordA, wordB, count);
+            var additionWords = await _word2VectorService.WordAdditionAsync(wordA, wordB);
             return Ok(additionWords);
         }
 
         [HttpGet("wordSubtraction")]
-        public async Task<IActionResult> GetWordSubtraction(string wordA, string wordB, int count)
+        public async Task<IActionResult> GetWordSubtraction(string wordA, string wordB)
         {
-            var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB, count);
+            var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);
             return Ok(subtractionWords);
         }
     }
