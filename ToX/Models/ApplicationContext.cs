@@ -35,4 +35,5 @@ public class ApplicationContext : DbContext
 
     public DbSet<User> User { get; set; } = null!;
     public DbSet<TodoItem> TodoItems { get; set; } = null!;
+    public DbSet<WordVector> WordVector { get; set; } = null!;
 }

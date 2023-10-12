@@ -5,6 +5,14 @@ using Npgsql;
 using ToX.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.WebUtilities;
+using ToX.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +63,8 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 app.UseCors(x => x
@@ -69,7 +79,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseWebSockets();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -78,5 +89,11 @@ var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 dbContext.Database.Migrate();
 
 app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("chatHub");
+    endpoints.MapControllers();
+});
 
 app.Run();
