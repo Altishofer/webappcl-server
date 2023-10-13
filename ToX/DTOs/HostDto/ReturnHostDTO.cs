@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using ToX.Models;
+using Host = ToX.Models.Host;
 
 namespace ToX.DTOs;
 
-public class ReturnUserDTO
+public class ReturnHostDTO
 {
     [Required]
     public long userId { get; set; }
@@ -12,11 +13,11 @@ public class ReturnUserDTO
     public String userName { get; set; }
     
     [JsonConstructor]
-    public ReturnUserDTO(){}
+    public ReturnHostDTO(){}
 
-    public ReturnUserDTO(User user)
+    public ReturnHostDTO(Host host)
     {
-        userId = user.userId;
-        userName = user.userName;
+        userId = host.hostId;
+        userName = host.hostName;
     }
 }

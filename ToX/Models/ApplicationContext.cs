@@ -16,24 +16,46 @@ public class ApplicationContext : DbContext
             entity.SetTableName(entity.GetTableName().ToLower());
         }
 
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.userName)
+        modelBuilder.Entity<Host>()
+            .HasIndex(u => u.hostName)
             .IsUnique();
 
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.userId)
+        modelBuilder.Entity<Host>()
+            .HasIndex(u => u.hostId)
             .IsUnique();
 
-        modelBuilder.Entity<User>()
-            .Property(u => u.userName)
+        modelBuilder.Entity<Host>()
+            .Property(u => u.hostName)
             .IsRequired();
 
-        modelBuilder.Entity<User>()
-            .Property(u => u.userId)
+        modelBuilder.Entity<Host>()
+            .Property(u => u.hostId)
+            .IsRequired();
+        
+        modelBuilder.Entity<Player>()
+            .HasIndex(u => u.PlayerName)
+            .IsUnique();
+
+        modelBuilder.Entity<Player>()
+            .HasIndex(u => u.Id)
+            .IsUnique();
+
+        modelBuilder.Entity<Player>()
+            .Property(u => u.PlayerName)
+            .IsRequired();
+
+        modelBuilder.Entity<Player>()
+            .Property(u => u.Id)
             .IsRequired();
     }
 
-    public DbSet<User> User { get; set; } = null!;
+    public DbSet<Host> Host { get; set; } = null!;
     public DbSet<TodoItem> TodoItems { get; set; } = null!;
     public DbSet<WordVector> WordVector { get; set; } = null!;
+    
+    public DbSet<Quiz> Quiz { get; set; } = null!;    
+    public DbSet<Answer> Answer { get; set; } = null!;
+    public DbSet<Round> Round { get; set; } = null!;
+    public DbSet<Player> Player { get; set; } = null!;
+
 }

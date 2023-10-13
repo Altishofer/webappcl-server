@@ -18,113 +18,117 @@ using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs;
 using ToX.Models;
 using ToX.Repositories;
+using ToX.Services;
+using Host = ToX.Models.Host;
 
 namespace ToX.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class HostController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        private readonly UserRepository _userRepository;
+        private readonly HostRepository _hostRepository;
+        private readonly HostService _hostService;
         private readonly IConfiguration _configuration;
         private readonly String _tokenSecret;
         private static readonly TimeSpan tokenLifetime = TimeSpan.FromHours(24);
 
-        public UserController(ApplicationContext context, IConfiguration config)
+        public HostController(ApplicationContext context, IConfiguration config)
         {
             _context = context;
-            _userRepository = new UserRepository(context);
+            _hostRepository = new HostRepository(context);
             _configuration = config;
             _tokenSecret = _configuration["JWT_SETTINGS_KEY"];
+            _hostService = new HostService(_context);
         }
 
-        // GET: api/User/GetUser/1
-        [HttpGet("GetUser/{pUserId}")]
+        // GET: api/Host/GetHost/1
+        [HttpGet("GetHost/{pHostId}")]
         [Authorize]
-        public async Task<IActionResult> GetUser([FromRoute] long pUserId)
+        public async Task<IActionResult> GetHost([FromRoute] long pHostId)
         {
-            User? user = await _context.User.FindAsync(pUserId);
-            if (user == null)
+            Host? host = await _context.Host.FindAsync(pHostId);
+            if (host == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Host not found.");
             }
             
-            return Ok(new ReturnUserDtoDebug(user));
+            return Ok(new ReturnHostDtoDebug(host));
         }
         
-        // GET: api/User/GetUsers
-        [HttpGet("GetUsers")]
+        // GET: api/Host/GetHosts
+        [HttpGet("GetHosts")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetHosts()
         {
-            List<User> userList = _userRepository.GetAllUsers();
-            List<ReturnUserDtoDebug> userDTOs = userList.Select(user => new ReturnUserDtoDebug(user)).ToList();
-            return Ok(userDTOs);
+            List<Host> hostList = _hostRepository.GetAllHosts();
+            List<ReturnHostDtoDebug> hostDTOs = hostList.Select(host => new ReturnHostDtoDebug(host)).ToList();
+            return Ok(hostDTOs);
         }
         
-        // POST: api/User/Register
+        // POST: api/Host/Register
         [HttpPost("Register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterHostDTO hostDTO)
         {
             if (!ModelState.IsValid){return BadRequest(ModelState);}
             
-            if (await _context.User.AnyAsync(u => u.userName == userDTO.userName))
+            if (await _context.Host.AnyAsync(u => u.hostName == hostDTO.hostName))
             {
-                ModelState.AddModelError("UserName", "Username is already taken.");
+                ModelState.AddModelError("HostName", "Hostname is already taken.");
                 return BadRequest(ModelState);
             }
             
-            User user = userDTO.toEntity();
-            user.userId = await _context.User.AnyAsync() ? (await _context.User.MaxAsync(u => u.userId)) + 1 : 0;
+            Host host = hostDTO.toEntity();
+            host.hostId = await _context.Host.AnyAsync() ? (await _context.Host.MaxAsync(u => u.hostId)) + 1 : 0;
 
-            _context.User.Add(user);
+            _context.Host.Add(host);
             await _context.SaveChangesAsync();
             
-            return CreatedAtAction(nameof(Register), new { Token = GenerateToken(userDTO) });
+            return CreatedAtAction(nameof(Register), new { Token = GenerateToken(hostDTO) });
         }
         
-        // POST: api/User/Login
+        // POST: api/Host/Login
         [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] RegisterUserDTO userDto)
+        public async Task<IActionResult> Login([FromBody] RegisterHostDTO hostDto)
         {
-            User user = await _context.User.SingleOrDefaultAsync(u => u.userName == userDto.userName);
+            Host host = await _context.Host.SingleOrDefaultAsync(u => u.hostName == hostDto.hostName);
 
-            if (user == null)
+            if (host == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Host not found.");
             }
 
-            if (user.userPassword != userDto.userPassword)
+            if (host.hostPassword != hostDto.hostPassword)
             {
                 return Unauthorized("Invalid credentials.");
             }
             
-            return Ok(new { Token = GenerateToken(userDto) });
+            return Ok(new { Token = GenerateToken(hostDto) });
         }
         
-        // POST: api/User/RefreshToken
+        // POST: api/Host/RefreshToken
         [HttpGet("RefreshToken")]
         [Authorize]
         public async Task<IActionResult> RefreshToken()
         {
-            var user = HttpContext.User;
+            var host = HttpContext.User;
             
-            var usernameClaim = user.Claims.FirstOrDefault(c => c.Type == "userName");
-            var passwordClaim = user.Claims.FirstOrDefault(c => c.Type == "userPassword");
+            var hostnameClaim = host.Claims.FirstOrDefault(c => c.Type == "hostName");
+            var passwordClaim = host.Claims.FirstOrDefault(c => c.Type == "hostPassword");
 
-            if (usernameClaim == null || passwordClaim == null)
+            if (hostnameClaim == null || passwordClaim == null)
             {
                 return Unauthorized("Invalid credentials.");
             }
 
-            return Ok(new { Token = GenerateToken(new RegisterUserDTO(usernameClaim.Value,  passwordClaim.Value)) });
+            return Ok(new { Token = GenerateToken(new RegisterHostDTO(hostnameClaim.Value,  passwordClaim.Value)) });
         }
 
         
-        private String GenerateToken([FromBody] RegisterUserDTO registerUserDto)
+        private String GenerateToken([FromBody] RegisterHostDTO registerHostDto)
         {
             JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             byte[] key = Encoding.UTF8.GetBytes(_tokenSecret);
@@ -132,9 +136,9 @@ namespace ToX.Controllers
             List<Claim> claims = new List<Claim>()
             {
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(JwtRegisteredClaimNames.Sub, registerUserDto.userName),
-                new("userName", registerUserDto.userName),
-                new("userPassword", registerUserDto.userPassword)
+                new(JwtRegisteredClaimNames.Sub, registerHostDto.hostName),
+                new("hostName", registerHostDto.hostName),
+                new("hostPassword", registerHostDto.hostPassword)
             };
 
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor

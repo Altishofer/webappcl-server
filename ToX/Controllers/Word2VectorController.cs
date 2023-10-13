@@ -21,7 +21,6 @@ namespace ToX.Controllers
         }
 
         [HttpGet("modelInfo")]
-        [AllowAnonymous]
         public IActionResult GetModelInfo()
         {
             _word2VectorService.PrintModelInfo();
@@ -29,7 +28,6 @@ namespace ToX.Controllers
         }
 
         [HttpGet("closestWords/{word}/{count}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetClosestWords([FromRoute] string word, [FromRoute] int count)
         {
             var closestWords = await _word2VectorService.FindClosestWordsAsync(word, count);
@@ -37,7 +35,6 @@ namespace ToX.Controllers
         }
         
         [HttpGet("closestWordsSQL")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetClosestWordsSQL(string word, int count)
         {
             var closestWords = await _word2VectorService.FindClosestWordsAsyncSQL(word, count);
@@ -45,7 +42,6 @@ namespace ToX.Controllers
         }
 
         [HttpGet("analogy")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAnalogy(string wordA, string wordB, string wordC, int count)
         {
             var analogyWords = await _word2VectorService.AnalogyAsync(wordA, wordB, wordC, count);
@@ -53,7 +49,6 @@ namespace ToX.Controllers
         }
 
         [HttpGet("wordAddition")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetWordAddition(string wordA, string wordB)
         {
             var additionWords = await _word2VectorService.WordAdditionAsync(wordA, wordB);
@@ -61,7 +56,6 @@ namespace ToX.Controllers
         }
 
         [HttpGet("wordSubtraction")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetWordSubtraction(string wordA, string wordB)
         {
             var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);

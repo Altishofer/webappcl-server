@@ -2,17 +2,17 @@
 
 namespace ToX.Repositories;
 
-public class UserRepository
+public class QuizRepository
 {
     private readonly ApplicationContext _context;
 
-    public UserRepository(ApplicationContext context)
+    public QuizRepository(ApplicationContext context)
     {
         _context = context;
     }
 
-    public List<User> GetAllUsers()
+    public List<Quiz> GetAllQuizs()
     {
-        return _context.User.ToList();
+        return _context.Quiz.ToList();
     }
 }
