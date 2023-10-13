@@ -14,9 +14,8 @@ namespace ToX.Controllers
 
         public Word2VectorController(ApplicationContext applicationContext)
         {
-            _word2VectorService = new Word2VectorService(applicationContext);
+            _word2VectorService = Word2VectorService.GetInstance(applicationContext);
             _context = applicationContext;
-            _word2VectorService.PrintModelInfo();
         }
 
         [HttpGet("modelInfo")]
@@ -26,10 +25,17 @@ namespace ToX.Controllers
             return Ok("Model information printed in the console.");
         }
 
-        [HttpGet("closestWords")]
-        public async Task<IActionResult> GetClosestWords(string word, int count)
+        [HttpGet("closestWords/{word}/{count}")]
+        public async Task<IActionResult> GetClosestWords([FromRoute] string word, [FromRoute] int count)
         {
             var closestWords = await _word2VectorService.FindClosestWordsAsync(word, count);
+            return Ok(closestWords);
+        }
+        
+        [HttpGet("closestWordsSQL")]
+        public async Task<IActionResult> GetClosestWordsSQL(string word, int count)
+        {
+            var closestWords = await _word2VectorService.FindClosestWordsAsyncSQL(word, count);
             return Ok(closestWords);
         }
 
