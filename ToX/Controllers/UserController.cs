@@ -54,6 +54,7 @@ namespace ToX.Controllers
         
         // GET: api/User/GetUsers
         [HttpGet("GetUsers")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUsers()
         {
             List<User> userList = _userRepository.GetAllUsers();
