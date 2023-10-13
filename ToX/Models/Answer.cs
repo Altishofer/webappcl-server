@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToX.Models;
 
+[Index(nameof(Id), IsUnique = true)]
 public class Answer
 {
     [Key]
@@ -20,8 +22,8 @@ public class Answer
 
     public Answer(long roundId, long playerId, string answerTarget)
     {
-        this.RoundId = roundId;
-        this.PlayerId = playerId;
-        this.AnswerTarget = answerTarget;
+        RoundId = roundId;
+        PlayerId = playerId;
+        AnswerTarget = answerTarget;
     }
 }

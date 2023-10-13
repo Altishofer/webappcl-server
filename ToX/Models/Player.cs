@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using ToX.Services;
 
 namespace ToX.Models;
 
+[Index(nameof(Id), IsUnique = true)]
 public class Player
 {
     [Key] 

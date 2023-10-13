@@ -1,5 +1,8 @@
-﻿namespace ToX.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace ToX.Models;
+
+[Index(nameof(Id), IsUnique = true)]
 public class TodoItem
 {
     public long Id { get; set; }

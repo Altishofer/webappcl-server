@@ -11,7 +11,7 @@ public class QuizRepository
         _context = context;
     }
 
-    public List<Quiz> GetAllQuizs()
+    public List<Quiz> GetAllQuizzes()
     {
         return _context.Quiz.ToList();
     }

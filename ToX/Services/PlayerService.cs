@@ -13,4 +13,9 @@ public class PlayerService
         _context = context;
         _playerRepository = new PlayerRepository(_context);
     }
+
+    public List<Player> GetAllPlayer()
+    {
+        return _playerRepository.GetAllPlayers();
+    }
 }

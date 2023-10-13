@@ -45,8 +45,17 @@ namespace ToX.Controllers
             _context.Player.Add(player);
             await _context.SaveChangesAsync();
             
-            //return CreatedAtAction(nameof(Register), new { Token = GenerateToken(hostDTO) });
             return CreatedAtAction(nameof(Register), new ReturnPlayerDto(player));
+        }
+        
+        // Get: api/Player
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllPlayers()
+        {
+            List <Player> players = _playerService.GetAllPlayer();
+            List <ReturnPlayerDto>  returnPlayersDto = players.Select(p => new ReturnPlayerDto(p)).ToList();
+            return CreatedAtAction(nameof(Register), returnPlayersDto);
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToX.Models;
 
+[Index(nameof(Id), IsUnique = true)]
 public class Quiz
 {
     [Key]
