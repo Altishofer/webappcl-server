@@ -19,9 +19,11 @@ namespace ToX.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly IConfiguration _config;
 
-        public TodoItemsController(ApplicationContext context)
+        public TodoItemsController(ApplicationContext context, IConfiguration config)
         {
+            _config = config;
             _context = context;
         }
         
@@ -35,7 +37,8 @@ namespace ToX.Controllers
             DistanceTo[] closest;
             try
             {
-                string relativeRootPath = Environment.GetEnvironmentVariable("CONTROLLER_ROOT_PATH");
+                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"] == null ? ".." : _config["CONTROLLER_ROOT_PATH"];
+
                 var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
