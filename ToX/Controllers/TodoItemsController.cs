@@ -46,7 +46,7 @@ namespace ToX.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ".bin file could not be fully loaded: " + ex.Message });
+                return NotFound(new { message = ".bin file could not be fully loaded: _" + _config["CONTROLLER_ROOT_PATH"] + "_ " + ex.Message });
             }
             return Ok(new
             {
