@@ -17,8 +17,8 @@ namespace ToX.Controllers
 
         public Word2VectorController(ApplicationContext applicationContext)
         {
-            _word2VectorService = Word2VectorService.GetInstance(applicationContext);
             _context = applicationContext;
+            _word2VectorService = Word2VectorService.GetInstance(_context);
         }
 
         [HttpGet("modelInfo")]
@@ -29,6 +29,7 @@ namespace ToX.Controllers
         }
 
         [HttpGet("closestWords/{word}/{count}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetClosestWords([FromRoute] string word, [FromRoute] int count)
         {
             var closestWords = await _word2VectorService.FindClosestWordsAsync(word, count);
