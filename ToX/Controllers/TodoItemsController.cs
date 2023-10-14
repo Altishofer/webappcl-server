@@ -37,8 +37,7 @@ namespace ToX.Controllers
             DistanceTo[] closest;
             try
             {
-                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"] == null ? ".." : _config["CONTROLLER_ROOT_PATH"];
-
+                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"] == null || _config["CONTROLLER_ROOT_PATH"] == "" ? ".." : _config["CONTROLLER_ROOT_PATH"];
                 var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
@@ -53,7 +52,8 @@ namespace ToX.Controllers
             {
                 length = length.ToString(),
                 dimensions = dimensions.ToString(),
-                similarWord = closest[0].Representation.WordOrNull
+                similarWord = closest[0].Representation.WordOrNull,
+                rootPath = _config["CONTROLLER_ROOT_PATH"]
             });
         }
 
