@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using ToX.Models;
 using dotenv.net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Routing.Constraints;
+using Word2vec.Tools;
 
 namespace ToX.Controllers
 {
@@ -26,11 +28,28 @@ namespace ToX.Controllers
         // GET: api/TodoItems/status
         [HttpGet("status")]
         [AllowAnonymous]
-        public ActionResult  GetStatus()
+        public async Task<ActionResult>  GetStatus()
         {
+            int length;
+            int dimensions;
+            DistanceTo[] closest;
+            try
+            {
+                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath("./GoogleNews-vectors-negative300.bin"));
+                length = voc.Words.Length;
+                dimensions = voc.VectorDimensionsCount;
+                closest = await Task.Run(() => voc.Distance("dog", 1));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ".bin file could not be fully loaded: " + ex.Message });
+            }
             return Ok(new
             {
-                message = "Server is up and running"
+                length = length.ToString(),
+                dimensions = dimensions.ToString(),
+                similarWord = closest[0].Representation.WordOrNull
             });
         }
 
