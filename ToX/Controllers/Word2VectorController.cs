@@ -7,6 +7,7 @@ using ToX.Services;
 
 namespace ToX.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class Word2VectorController : ControllerBase
