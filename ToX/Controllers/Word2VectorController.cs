@@ -26,7 +26,7 @@ namespace ToX.Controllers
         public Word2VectorController(ApplicationContext applicationContext)
         {
             _context = applicationContext;
-            //_word2VectorService = Word2VectorService.GetInstance(_context);
+            _word2VectorService = Word2VectorService.GetInstance(_context);
         }
         
         // GET: api/Word2Vector/status
