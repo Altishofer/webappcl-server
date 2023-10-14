@@ -58,19 +58,11 @@ builder.Services.AddAuthentication(x =>
     };
 }));
 builder.Services.AddAuthorizationCore();
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddSignalR();
 
 var app = builder.Build();
-
-app.UseCors(x => x
-    .AllowAnyOrigin() //.WithOrigins("http://localhost:4200", "http://172.23.49.21:8017")
-    .AllowAnyHeader()
-    .AllowAnyMethod());
 
 if (app.Environment.IsDevelopment())
 {
@@ -78,17 +70,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-app.UseWebSockets();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-
 using var scope = app.Services.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 dbContext.Database.Migrate();
 
 app.MapControllers();
 app.MapHub<ChatHub>("chatHub");
+
+app.UseCors(x => x
+    .AllowAnyOrigin() //.WithOrigins("http://localhost:4200", "http://172.23.49.21:8017")
+    .AllowAnyHeader()
+    .AllowAnyMethod());
+
+//app.UseHttpsRedirection();
+app.UseWebSockets();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
