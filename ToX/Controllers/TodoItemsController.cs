@@ -36,23 +36,37 @@ namespace ToX.Controllers
             int length;
             int dimensions;
             DistanceTo[] closest;
+            string relativeRootPath;
             try
             {
-                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"];
-                if (relativeRootPath.IsNullOrEmpty())
-                {
-                    relativeRootPath = "..";
-                }
-                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
-                length = voc.Words.Length;
-                dimensions = voc.VectorDimensionsCount;
-                closest = await Task.Run(() => voc.Distance("dog", 1));
-
+                relativeRootPath = _config["CONTROLLER_ROOT_PATH"];
             }
             catch (Exception ex)
             {
                 return NotFound(new
                 {
+                    exception = "raised during _config access",
+                    error = ex.Message,
+                    rootPath = _config["CONTROLLER_ROOT_PATH"],
+                    currentPath = Environment.CurrentDirectory
+                });
+            }
+            if (relativeRootPath.IsNullOrEmpty())
+            {
+                relativeRootPath = "..";
+            }
+            try
+            {
+                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
+                length = voc.Words.Length;
+                dimensions = voc.VectorDimensionsCount;
+                closest = await Task.Run(() => voc.Distance("dog", 1));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new
+                {
+                    exception = "raised during file access",
                     error = ex.Message,
                     rootPath = _config["CONTROLLER_ROOT_PATH"],
                     currentPath = Environment.CurrentDirectory
