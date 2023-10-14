@@ -11,9 +11,7 @@ deploy:
     - main
   script:
     - set-env DB_NAME=$DB_NAME DB_PASSWORD=$DB_PASSWORD DB_USER=$DB_USER DB_HOST=$DB_HOST DB_PORT=$DB_PORT JWT_SETTINGS_ISSUER=$JWT_SETTINGS_ISSUER JWT_SETTINGS_AUDIENCE=$JWT_SETTINGS_AUDIENCE JWT_SETTINGS_KEY=$JWT_SETTINGS_KEY
-    - ssh dokku@localhost
-    - cd $CI_PROJECT_NAME-$CI_PROJECT_ID
-    - ls -l
+    - ssh dokku@localhost "cd $CI_PROJECT_NAME-$CI_PROJECT_ID && ls -l"
     - scp ToX/GoogleNews-vectors-negative300.bin dokku@localhost:$CI_PROJECT_NAME-$CI_PROJECT_ID/webappcl-server/Tox/
     - git-push main
 
