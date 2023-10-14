@@ -53,7 +53,7 @@ namespace ToX.Controllers
             }
             if (relativeRootPath.IsNullOrEmpty())
             {
-                relativeRootPath = "..";
+                relativeRootPath = "/src/ToX";
             }
             try
             {
