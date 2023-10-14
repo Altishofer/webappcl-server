@@ -35,7 +35,8 @@ namespace ToX.Controllers
             DistanceTo[] closest;
             try
             {
-                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath("./GoogleNews-vectors-negative300.bin"));
+                string relativeRootPath = Environment.GetEnvironmentVariable("CONTROLLER_ROOT_PATH");
+                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
                 closest = await Task.Run(() => voc.Distance("dog", 1));
