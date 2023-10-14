@@ -1,13 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ToX.DTOs;
+using ToX.Models;
+using ToX.Repositories;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using ToX.Models;
 using ToX.Services;
+using Word2vec = ToX.Models.WordVector;
 
 namespace ToX.Controllers
 {
-    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class Word2VectorController : ControllerBase
@@ -19,6 +27,17 @@ namespace ToX.Controllers
         {
             _context = applicationContext;
             _word2VectorService = Word2VectorService.GetInstance(_context);
+        }
+        
+        // GET: api/Word2Vector/status
+        [HttpGet("status")]
+        [AllowAnonymous]
+        public ActionResult  GetStatus()
+        {
+            return Ok(new
+            {
+                message = "Server is up and running"
+            });
         }
 
         [HttpGet("modelInfo")]
