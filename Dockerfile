@@ -26,7 +26,8 @@ RUN  curl -O 'https://dwqi5g.db.files.1drv.com/y4mJZ0MBu23SvZupYnJ0alRGwyhIObwcv
                -H 'sec-fetch-user: ?1' \
                -H 'upgrade-insecure-requests: 1' \
                -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.60' \
-               --compressed
+               --compressed \
+Run ls -l
 
 RUN dotnet build "ToX.csproj" -c Release -o /app/build
 
