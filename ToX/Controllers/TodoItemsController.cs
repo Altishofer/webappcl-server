@@ -38,8 +38,11 @@ namespace ToX.Controllers
             DistanceTo[] closest;
             try
             {
-                string currentDir = Environment.CurrentDirectory;
-                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"].IsNullOrEmpty() ? ".." : _config["CONTROLLER_ROOT_PATH"];
+                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"];
+                if (relativeRootPath.IsNullOrEmpty())
+                {
+                    relativeRootPath = "..";
+                }
                 var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
