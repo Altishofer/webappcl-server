@@ -10,6 +10,7 @@ using ToX.Models;
 using dotenv.net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.IdentityModel.Tokens;
 using Word2vec.Tools;
 
 namespace ToX.Controllers
@@ -37,7 +38,8 @@ namespace ToX.Controllers
             DistanceTo[] closest;
             try
             {
-                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"] == null || _config["CONTROLLER_ROOT_PATH"] == "" ? ".." : _config["CONTROLLER_ROOT_PATH"];
+                string currentDir = Environment.CurrentDirectory;
+                string relativeRootPath = _config["CONTROLLER_ROOT_PATH"].IsNullOrEmpty() ? ".." : _config["CONTROLLER_ROOT_PATH"];
                 var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
@@ -46,7 +48,12 @@ namespace ToX.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ".bin file could not be fully loaded: _" + _config["CONTROLLER_ROOT_PATH"] + "_ " + ex.Message });
+                return NotFound(new
+                {
+                    error = ex.Message,
+                    rootPath = _config["CONTROLLER_ROOT_PATH"],
+                    currentPath = Environment.CurrentDirectory
+                });
             }
             return Ok(new
             {
