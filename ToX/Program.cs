@@ -89,11 +89,6 @@ var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 dbContext.Database.Migrate();
 
 app.MapControllers();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<ChatHub>("chatHub");
-    endpoints.MapControllers();
-});
+app.MapHub<ChatHub>("chatHub");
 
 app.Run();
