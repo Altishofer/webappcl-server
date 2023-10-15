@@ -39,7 +39,7 @@ namespace ToX.Controllers
             string relativeRootPath;
             try
             {
-                relativeRootPath = _config["CONTROLLER_ROOT_PATH"];
+                relativeRootPath = _config["VECTOR_BIN"];
             }
             catch (Exception ex)
             {
@@ -47,17 +47,13 @@ namespace ToX.Controllers
                 {
                     exception = "raised during _config access",
                     error = ex.Message,
-                    rootPath = _config["CONTROLLER_ROOT_PATH"],
+                    rootPath = _config["VECTOR_BIN"],
                     currentPath = Environment.CurrentDirectory
                 });
             }
-            if (relativeRootPath.IsNullOrEmpty())
-            {
-                relativeRootPath = "/src/ToX";
-            }
             try
             {
-                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath + "/GoogleNews-vectors-negative300.bin"));
+                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath));
                 length = voc.Words.Length;
                 dimensions = voc.VectorDimensionsCount;
                 closest = await Task.Run(() => voc.Distance("dog", 1));
@@ -77,7 +73,7 @@ namespace ToX.Controllers
                 length = length.ToString(),
                 dimensions = dimensions.ToString(),
                 similarWord = closest[0].Representation.WordOrNull,
-                rootPath = _config["CONTROLLER_ROOT_PATH"]
+                rootPath = _config["VECTOR_BIN"]
             });
         }
 
