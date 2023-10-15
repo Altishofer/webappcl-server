@@ -12,6 +12,9 @@ public class QuizDto
     [Required]
     public long HostId { get; set; }
     
+    [Required]
+    public string Title { get; set; }
+    
     [JsonConstructor]
     public QuizDto(){}
 
@@ -19,5 +22,6 @@ public class QuizDto
     {
         Id = quiz.Id;
         HostId = quiz.HostId;
+        Title = quiz.Title;
     }
 }

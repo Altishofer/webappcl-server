@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace ToX.Models;
@@ -6,10 +7,27 @@ namespace ToX.Models;
 [Index(nameof(Id), IsUnique = true)]
 public class Quiz
 {
-    [Key]
-    public long Id { get; set; }
+  [Key]
+  [Column("id")]
+  public long Id { get; set; }
     
-    [Required]
-    public long HostId { get; set; }
+  [Required]
+  [Column("hostid")]
+  public long HostId { get; set; }
+    
+  [Required]
+  [Column("title")]
+  public string Title { get; set; }
+  
+  public Quiz()
+  {
+  }
+
+  public Quiz(long id, long hostId, string title)
+  {
+    Id = id;
+    HostId = hostId;
+    Title = title;
+  }
     
 }

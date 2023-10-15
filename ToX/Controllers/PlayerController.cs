@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using ToX.DTOs.PlayerDto;
 using ToX.Models;
 using ToX.Repositories;
@@ -33,17 +38,13 @@ namespace ToX.Controllers
         {
             if (!ModelState.IsValid){return BadRequest(ModelState);}
             
-            if (await _context.Player.AnyAsync(u => u.PlayerName == registerPlayerDto.PlayerName))
+            if (await _playerService.PlayerExistsByPlayerName(registerPlayerDto.PlayerName))
             {
                 ModelState.AddModelError("PlayerName", "PlayerName is already taken.");
                 return BadRequest(ModelState);
             }
-            
-            Player player = registerPlayerDto.toEntity();
-            player.Id = await _context.Player.AnyAsync() ? (await _context.Player.MaxAsync(u => u.Id)) + 1 : 0;
 
-            _context.Player.Add(player);
-            await _context.SaveChangesAsync();
+            Player player = await _playerService.CreatePlayer(registerPlayerDto);
             
             return CreatedAtAction(nameof(Register), new ReturnPlayerDto(player));
         }
@@ -53,7 +54,7 @@ namespace ToX.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllPlayers()
         {
-            List <Player> players = _playerService.GetAllPlayer();
+            List <Player> players = await _playerService.GetAllPlayers();
             List <ReturnPlayerDto>  returnPlayersDto = players.Select(p => new ReturnPlayerDto(p)).ToList();
             return CreatedAtAction(nameof(Register), returnPlayersDto);
         }

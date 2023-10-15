@@ -9,10 +9,10 @@ public class ReturnHostDtoDebug
     [Required]
     public long hostId { get; set; }
     [Required]
-    public String hostName { get; set; }
+    public string hostName { get; set; }
 
     [Required] 
-    public String hostPassword { get; set; }
+    public string hostPassword { get; set; }
 
     [JsonConstructor]
     public ReturnHostDtoDebug(){}

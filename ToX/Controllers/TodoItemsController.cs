@@ -10,6 +10,7 @@ using ToX.Models;
 using dotenv.net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Word2vec.Tools;
 
@@ -40,11 +41,11 @@ namespace ToX.Controllers
             {
                 return Content("Database connection failed: " + ex.Message); 
             }
-              if (_context.TodoItems == null)
-              {
-                  return NotFound();
-              }
-              return await _context.TodoItems.ToListAsync();
+            if (_context.TodoItems == null)
+            {
+              return NotFound();
+            }
+            return await _context.TodoItems.ToListAsync();
         }
 
         // GET: api/TodoItems/5

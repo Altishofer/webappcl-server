@@ -1,4 +1,8 @@
-﻿using ToX.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using ToX.Models;
 
 namespace ToX.Repositories;
 
@@ -11,8 +15,30 @@ public class QuizRepository
         _context = context;
     }
 
-    public List<Quiz> GetAllQuizzes()
+    public async Task<List<Quiz>> GetAllQuizzes()
     {
         return _context.Quiz.ToList();
+    }
+    
+    public async Task<Quiz?> GetQuizById(long quizId)
+    {
+        return await _context.Quiz.FindAsync(quizId);
+    }
+    
+    public async Task<bool> QuizExistsById(long quizId)
+    {
+        return await _context.Quiz.AnyAsync(h => h.Id == quizId);
+    }
+
+    public async Task<long> NextQuizId()
+    {
+        return await _context.Quiz.AnyAsync() ? (await _context.Quiz.MaxAsync(u => u.Id)) + 1 : 0;
+    }
+
+    public async Task<Quiz> SaveQuiz(Quiz quiz)
+    {
+        _context.Quiz.Add(quiz);
+        await _context.SaveChangesAsync();
+        return quiz;
     }
 }

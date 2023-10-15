@@ -1,4 +1,7 @@
-﻿using ToX.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using ToX.DTOs.QuizDto;
+using ToX.Models;
 using ToX.Repositories;
 
 namespace ToX.Services;
@@ -14,8 +17,21 @@ public class QuizService
         _quizRepository = new QuizRepository(_context);
     }
     
-    public List<Quiz> GetAllQuizzes()
+    public async Task<List<Quiz>> GetAllQuizzes()
     {
-        return _quizRepository.GetAllQuizzes();
+        return await _quizRepository.GetAllQuizzes();
+    }
+    
+    public async Task<Quiz> CreateQuiz(QuizDto quizDto)
+    {
+        Quiz quiz = new Quiz();
+        quiz.Id = await _quizRepository.NextQuizId();
+        quiz.HostId = quizDto.HostId;
+        return await _quizRepository.SaveQuiz(quiz);
+    }
+    
+    public async Task<Quiz?> GetQuizOrNull(long id)
+    {
+        return await _quizRepository.GetQuizById(id);
     }
 }

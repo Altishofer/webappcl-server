@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,14 +8,17 @@ using ToX.DTOs;
 using ToX.Models;
 using ToX.Repositories;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs;
 using ToX.Models;
@@ -42,27 +47,13 @@ namespace ToX.Controllers
             _tokenSecret = _configuration["JWT_SETTINGS_KEY"];
             _hostService = new HostService(_context);
         }
-
-        // GET: api/Host/GetHost/1
-        [HttpGet("GetHost/{pHostId}")]
-        [Authorize]
-        public async Task<IActionResult> GetHost([FromRoute] long pHostId)
-        {
-            Host? host = await _context.Host.FindAsync(pHostId);
-            if (host == null)
-            {
-                return NotFound("Host not found.");
-            }
-            
-            return Ok(new ReturnHostDtoDebug(host));
-        }
         
         // GET: api/Host/GetHosts
         [HttpGet("GetHosts")]
         [AllowAnonymous]
         public async Task<IActionResult> GetHosts()
         {
-            List<Host> hostList = _hostRepository.GetAllHosts();
+            List<Host> hostList = await _hostService.GetAllHosts();
             List<ReturnHostDtoDebug> hostDTOs = hostList.Select(host => new ReturnHostDtoDebug(host)).ToList();
             return Ok(hostDTOs);
         }
@@ -74,18 +65,13 @@ namespace ToX.Controllers
         {
             if (!ModelState.IsValid){return BadRequest(ModelState);}
             
-            if (await _context.Host.AnyAsync(u => u.hostName == hostDTO.hostName))
+            if (await _hostService.HostExistsByHostName(hostDTO.hostName))
             {
                 ModelState.AddModelError("HostName", "Hostname is already taken.");
                 return BadRequest(ModelState);
             }
-            
-            Host host = hostDTO.toEntity();
-            host.hostId = await _context.Host.AnyAsync() ? (await _context.Host.MaxAsync(u => u.hostId)) + 1 : 0;
 
-            _context.Host.Add(host);
-            await _context.SaveChangesAsync();
-            
+            await _hostService.CreateHost(hostDTO);
             return CreatedAtAction(nameof(Register), new { Token = GenerateToken(hostDTO) });
         }
         
@@ -94,8 +80,7 @@ namespace ToX.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] RegisterHostDTO hostDto)
         {
-            Host host = await _context.Host.SingleOrDefaultAsync(u => u.hostName == hostDto.hostName);
-
+            Host? host = await _hostService.GetHostOrNull(hostDto);
             if (host == null)
             {
                 return NotFound("Host not found.");

@@ -10,7 +10,7 @@ public class ReturnHostDTO
     [Required]
     public long userId { get; set; }
     [Required]
-    public String userName { get; set; }
+    public string userName { get; set; }
     
     [JsonConstructor]
     public ReturnHostDTO(){}

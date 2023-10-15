@@ -8,9 +8,9 @@ namespace ToX.DTOs;
 public class RegisterHostDTO
 {
     [Required]
-    public String hostName { get; set; }
+    public string hostName { get; set; }
     [Required]
-    public String hostPassword { get; set; }
+    public string hostPassword { get; set; }
     
     [JsonConstructor]
     public RegisterHostDTO(){}
@@ -21,7 +21,7 @@ public class RegisterHostDTO
         hostPassword = host.hostPassword;
     }
     
-    public RegisterHostDTO(String hostName, String hostPassword)
+    public RegisterHostDTO(string hostName, string hostPassword)
     {
         this.hostName = hostName;
         this.hostPassword = hostPassword;

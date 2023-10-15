@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -16,8 +18,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs;
+using ToX.DTOs.QuizDto;
+using ToX.DTOs.RoundDto;
 using ToX.Models;
 using ToX.Repositories;
+using ToX.Services;
 using Host = ToX.Models.Host;
 
 namespace ToX.Controllers
@@ -27,18 +32,79 @@ namespace ToX.Controllers
     public class QuizController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly QuizService _quizService;
+        private readonly RoundService _roundService;
+        private readonly AnswerService _answerService;
 
         public QuizController(ApplicationContext context)
         {
             _context = context;
+            _quizService = new QuizService(_context);
+            _roundService = new RoundService(_context);
+            _answerService = new AnswerService(_context);
         }
         
-        [HttpGet("GetAllQuiz")]
+        [HttpGet("GetAllQuizzes")]
         public async Task<IActionResult> GetAllQuiz()
         {
-            List<Quiz> quizzes = _context.Quiz.ToList();
-        
+            List<Quiz> quizzes = await _quizService.GetAllQuizzes();
             return Ok(quizzes);
+        }
+        
+        [HttpPost("CreateQuiz")]
+        public async Task<IActionResult> CreateQuiz(QuizDto quizDto)
+        {
+            if (!ModelState.IsValid){return BadRequest(ModelState);}
+            
+            Quiz quiz = await _quizService.CreateQuiz(quizDto);
+            QuizDto returnQuizDto = new QuizDto(quiz);
+            return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto});
+        }
+        
+        [HttpPost("CreateRound")]
+        public async Task<IActionResult> CreateRound(RoundDto roundDto)
+        {
+            if (!ModelState.IsValid){return BadRequest(ModelState);}
+            
+            Round round = await _roundService.CreateRound(roundDto);
+            RoundDto returnRoundDto = new RoundDto(round);
+            return CreatedAtAction(nameof(CreateRound), new { returnRoundDto});
+        }
+        
+        [HttpPost("CreateAnswer")]
+        public async Task<IActionResult> CreateAnswer(AnswerDto answerDto)
+        {
+            if (!ModelState.IsValid){return BadRequest(ModelState);}
+            
+            Answer answer = await _answerService.CreateAnswer(answerDto);
+            AnswerDto returnAnswerDto = new AnswerDto(answer);
+            return CreatedAtAction(nameof(CreateAnswer), new { returnAnswerDto});
+        }
+        
+        [HttpGet("GetQuiz/{id}")]
+        public async Task<IActionResult> GetAllQuiz([FromRoute] long id)
+        {
+            Quiz? quiz = await _quizService.GetQuizOrNull(id);
+            if (quiz == null)
+            {
+                return NotFound("quiz not found");
+            }
+            
+            QuizDto quizDto = new QuizDto(quiz);
+            return Ok(new { quizDto });
+        }
+        
+        [HttpGet("GetAnswer/{id}")]
+        public async Task<IActionResult> GetAnswer([FromRoute] long id)
+        {
+            Answer? answer = await _answerService.GetAnswerOrNull(id);
+            if (answer == null)
+            {
+                return NotFound("answer not found");
+            }
+            
+            AnswerDto answerDto = new AnswerDto(answer);
+            return Ok(new { answerDto });
         }
     }
     
