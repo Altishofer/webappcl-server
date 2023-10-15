@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using ToX.Models;
 using ToX.Services;
+using Word2vec.Tools;
 using Word2vec = ToX.Models.WordVector;
 
 namespace ToX.Controllers
@@ -22,11 +23,13 @@ namespace ToX.Controllers
     {
         private readonly Word2VectorService _word2VectorService;
         private readonly ApplicationContext _context;
+        private readonly IConfiguration _config;
 
         public Word2VectorController(ApplicationContext applicationContext, IConfiguration config)
         {
             _context = applicationContext;
-            _word2VectorService = Word2VectorService.GetInstance(_context, config);
+            _config = config;
+            _word2VectorService = Word2VectorService.GetInstance(_context, _config);
         }
         
         // GET: api/Word2Vector/status
@@ -34,17 +37,35 @@ namespace ToX.Controllers
         [AllowAnonymous]
         public async Task<ActionResult>  GetStatus()
         {
+            int length;
+            int dimensions;
+            DistanceTo[] closest;
+            string relativeRootPath;
+            try
+            {
+                relativeRootPath = _config["VECTOR_BIN"];
+                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath));
+                length = voc.Words.Length;
+                dimensions = voc.VectorDimensionsCount;
+                closest = await Task.Run(() => voc.Distance("dog", 1));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new
+                {
+                    exception = "File could not be loaded",
+                    error = ex.Message,
+                    rootPath = _config["VECTOR_BIN"],
+                    currentPath = Environment.CurrentDirectory
+                });
+            }
             return Ok(new
             {
-                message = "Server is up and running"
+                length = length.ToString(),
+                dimensions = dimensions.ToString(),
+                similarWord = closest[0].Representation.WordOrNull,
+                rootPath = _config["VECTOR_BIN"]
             });
-        }
-
-        [HttpGet("modelInfo")]
-        public IActionResult GetModelInfo()
-        {
-            _word2VectorService.PrintModelInfo();
-            return Ok("Model information printed in the console.");
         }
 
         [HttpGet("closestWords/{word}/{count}")]

@@ -27,55 +27,6 @@ namespace ToX.Controllers
             _config = config;
             _context = context;
         }
-        
-        // GET: api/TodoItems/status
-        [HttpGet("status")]
-        [AllowAnonymous]
-        public async Task<ActionResult>  GetStatus()
-        {
-            int length;
-            int dimensions;
-            DistanceTo[] closest;
-            string relativeRootPath;
-            try
-            {
-                relativeRootPath = _config["VECTOR_BIN"];
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new
-                {
-                    exception = "raised during _config access",
-                    error = ex.Message,
-                    rootPath = _config["VECTOR_BIN"],
-                    currentPath = Environment.CurrentDirectory
-                });
-            }
-            try
-            {
-                var voc = new Word2VecBinaryReader().Read(Path.GetFullPath(relativeRootPath));
-                length = voc.Words.Length;
-                dimensions = voc.VectorDimensionsCount;
-                closest = await Task.Run(() => voc.Distance("dog", 1));
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new
-                {
-                    exception = "raised during file access",
-                    error = ex.Message,
-                    rootPath = _config["CONTROLLER_ROOT_PATH"],
-                    currentPath = Environment.CurrentDirectory
-                });
-            }
-            return Ok(new
-            {
-                length = length.ToString(),
-                dimensions = dimensions.ToString(),
-                similarWord = closest[0].Representation.WordOrNull,
-                rootPath = _config["VECTOR_BIN"]
-            });
-        }
 
         // GET: api/TodoItems
         [HttpGet]
