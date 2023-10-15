@@ -23,10 +23,10 @@ namespace ToX.Controllers
         private readonly Word2VectorService _word2VectorService;
         private readonly ApplicationContext _context;
 
-        public Word2VectorController(ApplicationContext applicationContext)
+        public Word2VectorController(ApplicationContext applicationContext, IConfiguration config)
         {
             _context = applicationContext;
-            _word2VectorService = Word2VectorService.GetInstance(_context);
+            _word2VectorService = Word2VectorService.GetInstance(_context, config);
         }
         
         // GET: api/Word2Vector/status

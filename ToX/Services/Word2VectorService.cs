@@ -11,14 +11,16 @@ public class Word2VectorService
     private readonly ApplicationContext _context;
     private static Word2VectorService? _instance;
     private static readonly object _lock = new object();
+    private readonly IConfiguration _config;
 
-    public Word2VectorService(ApplicationContext applicationContext)
+    public Word2VectorService(ApplicationContext applicationContext, IConfiguration config)
     {
-        _vocabulary = new Word2VecBinaryReader().Read(Path.GetFullPath("./GoogleNews-vectors-negative300.bin"));
         _context = applicationContext;
+        _config = config;
+        _vocabulary = new Word2VecBinaryReader().Read(Path.GetFullPath(_config["VECTOR_BIN"]));
     }
     
-    public static Word2VectorService GetInstance(ApplicationContext applicationContext)
+    public static Word2VectorService GetInstance(ApplicationContext applicationContext, IConfiguration config)
     {
         if (_instance == null)
         {
@@ -26,7 +28,7 @@ public class Word2VectorService
             {
                 if (_instance == null)
                 {
-                    _instance = new Word2VectorService(applicationContext);
+                    _instance = new Word2VectorService(applicationContext, config);
                 }
             }
         }
