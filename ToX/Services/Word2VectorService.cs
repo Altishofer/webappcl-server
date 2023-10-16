@@ -130,45 +130,26 @@ public class Word2VectorService
         }
         return new Representation("null", new float[300]);
     }
-
-    
-    private async Task<Representation> _addVectors(Representation vectorA, Representation vectorB)
-    {
-        float[] resultVector = new float[300];
-        for (int i = 0; i < resultVector.Length; i++)
-        {
-            resultVector[i] = vectorA.NumericVector[i] + vectorB.NumericVector[i];
-        }
-        return new Representation("interMediateResult", resultVector);
-    }
-    
-    private async Task<Representation> _subtVectors(Representation vectorA, Representation vectorB)
-    {
-        float[] resultVector = new float[300];
-        for (int i = 0; i < resultVector.Length; i++)
-        {
-            resultVector[i] = vectorA.NumericVector[i] - vectorB.NumericVector[i];
-        }
-        return new Representation("interMediateResult", resultVector);
-    }
     
     private async Task<Representation> _addWordToVector(string word, Representation vectorB)
     {
-        Representation vectorA = await _getWordOrNullVector(word);
-        if (vectorA == null)
+        Representation? vectorA = await _getWordOrNullVector(word);
+        if (vectorA == _NullVector)
         {
             return vectorB;
         }
-        return await _addVectors(vectorA, vectorB);
+
+        return vectorB.Add(vectorA);
     }
     
     private async Task<Representation> _subtWordFromVector(string word, Representation vectorB)
     {
         Representation vectorA = await _getWordOrNullVector(word);
-        if (vectorA == null)
+        if (vectorA == _NullVector)
         {
             return vectorB;
         }
-        return await _subtVectors(vectorB, vectorA);
+
+        return vectorB.Substract(vectorA);
     }
 }
