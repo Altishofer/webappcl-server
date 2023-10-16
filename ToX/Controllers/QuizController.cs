@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs;
 using ToX.DTOs.QuizDto;
@@ -32,16 +33,20 @@ namespace ToX.Controllers
     public class QuizController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly IConfiguration _config;
         private readonly QuizService _quizService;
         private readonly RoundService _roundService;
         private readonly AnswerService _answerService;
+        private readonly Word2VectorService _word2VectorService;
 
-        public QuizController(ApplicationContext context)
+        public QuizController(ApplicationContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
+            _word2VectorService = Word2VectorService.GetInstance(_context, _config);
             _quizService = new QuizService(_context);
-            _roundService = new RoundService(_context);
-            _answerService = new AnswerService(_context);
+            _roundService = new RoundService(_context, _word2VectorService);
+            _answerService = new AnswerService(_context, _word2VectorService);
         }
         
         [HttpGet("GetAllQuizzes")]
@@ -52,7 +57,7 @@ namespace ToX.Controllers
         }
         
         [HttpPost("CreateQuiz")]
-        public async Task<IActionResult> CreateQuiz(QuizDto quizDto)
+        public async Task<IActionResult> CreateQuiz([FromBody] QuizDto quizDto)
         {
             if (!ModelState.IsValid){return BadRequest(ModelState);}
             

@@ -10,11 +10,13 @@ public class RoundService
 {
   private readonly ApplicationContext _context;
   private readonly RoundRepository _roundRepository;
+  private readonly Word2VectorService _word2VectorService;
 
-  public RoundService(ApplicationContext context)
+  public RoundService(ApplicationContext context, Word2VectorService word2VectorService)
   {
     _context = context;
     _roundRepository = new RoundRepository(_context);
+    _word2VectorService = word2VectorService;
   }
     
   public async Task<List<Round>> GetAllRounds()
@@ -24,9 +26,8 @@ public class RoundService
   
   public async Task<Round> CreateRound(RoundDto roundDto)
   {
-    Round round = new Round();
+    Round round = roundDto.toRound();
     round.Id = await _roundRepository.NextRoundId();
-    round.QuizId = roundDto.QuizId;
     return await _roundRepository.SaveRound(round);
   }
     

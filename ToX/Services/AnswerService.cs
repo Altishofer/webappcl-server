@@ -10,11 +10,13 @@ public class AnswerService
 {
   private readonly ApplicationContext _context;
   private readonly AnswerRepository _answerRepository;
+  private readonly Word2VectorService _word2VectorService;
 
-  public AnswerService(ApplicationContext context)
+  public AnswerService(ApplicationContext context, Word2VectorService word2VectorService)
   {
     _context = context;
     _answerRepository = new AnswerRepository(_context);
+    _word2VectorService = word2VectorService;
   }
     
   public async Task<List<Answer>> GetAllAnswers()
@@ -24,9 +26,8 @@ public class AnswerService
   
   public async Task<Answer> CreateAnswer(AnswerDto answerDto)
   {
-    Answer answer = new Answer();
+    Answer answer = answerDto.toAnswer();
     answer.Id = await _answerRepository.NextAnswerId();
-    answer.RoundId = answerDto.RoundId;
     return await _answerRepository.SaveAnswer(answer);
   }
     

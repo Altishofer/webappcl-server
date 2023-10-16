@@ -18,9 +18,18 @@ public class Round
 
   [Required]
   [Column("roundtarget")]
-  public WordVector RoundTarget { get; set; }
+  public string RoundTarget { get; set; }
     
   [Column("forbiddenwords")]
   public string[] ForbiddenWords { get; set; }
   
+  public Round(){}
+
+  public Round(long id, long quizId, string roundTarget, string[] forbiddenWords)
+  {
+    Id = id;
+    QuizId = quizId;
+    RoundTarget = roundTarget;
+    ForbiddenWords = forbiddenWords;
+  }
 }

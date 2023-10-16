@@ -28,4 +28,13 @@ public class AnswerDto
     PlayerId = answer.PlayerId;
     AnswerTarget = answer.AnswerTarget;
   }
+
+  public Answer toAnswer()
+  {
+    Answer answer = new Answer();
+    answer.RoundId = RoundId;
+    answer.AnswerTarget = AnswerTarget;
+    answer.PlayerId = PlayerId;
+    return answer;
+  }
 }

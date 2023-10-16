@@ -24,9 +24,8 @@ public class QuizService
     
     public async Task<Quiz> CreateQuiz(QuizDto quizDto)
     {
-        Quiz quiz = new Quiz();
+        Quiz quiz = quizDto.toQuiz();
         quiz.Id = await _quizRepository.NextQuizId();
-        quiz.HostId = quizDto.HostId;
         return await _quizRepository.SaveQuiz(quiz);
     }
     

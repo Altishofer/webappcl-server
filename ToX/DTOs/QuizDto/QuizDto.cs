@@ -24,4 +24,12 @@ public class QuizDto
         HostId = quiz.HostId;
         Title = quiz.Title;
     }
+
+    public Quiz toQuiz()
+    {
+        Quiz quiz = new Quiz();
+        quiz.Title = Title;
+        quiz.HostId = HostId;
+        return quiz;
+    }
 }

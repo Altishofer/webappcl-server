@@ -32,7 +32,7 @@ public class AnswerRepository
 
     public async Task<long> NextAnswerId()
     {
-        return await _context.Answer.FirstOrDefaultAsync()==null ? (await _context.Answer.MaxAsync(u => u.Id)) + 1 : 0;
+        return await _context.Answer.AnyAsync() ? (await _context.Answer.MaxAsync(u => u.Id)) + 1 : 0;
     }
 
     public async Task<Answer> SaveAnswer(Answer answer)

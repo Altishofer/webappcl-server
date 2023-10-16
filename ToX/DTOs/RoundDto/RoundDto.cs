@@ -11,6 +11,11 @@ public class RoundDto
     
   [Required]
   public long QuizId { get; set; }
+  
+  [Required]
+  public string RoundTarget { get; set; }
+  
+  public string[] ForbiddenWords { get; set; }
     
   [JsonConstructor]
   public RoundDto(){}
@@ -19,5 +24,16 @@ public class RoundDto
   {
     Id = round.Id;
     QuizId = round.QuizId;
+    RoundTarget = round.RoundTarget;
+    ForbiddenWords = round.ForbiddenWords;
+  }
+
+  public Round toRound()
+  {
+    Round round = new Round();
+    round.QuizId = QuizId;
+    round.ForbiddenWords = ForbiddenWords;
+    round.RoundTarget = RoundTarget;
+    return round;
   }
 }
