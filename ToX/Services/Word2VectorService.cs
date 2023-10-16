@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using ToX.DTOs.VectorDto;
 using ToX.Models;
 using Word2vec.Tools;
 
@@ -14,12 +17,14 @@ public class Word2VectorService
     private static Word2VectorService? _instance;
     private static readonly object _lock = new object();
     private readonly IConfiguration _config;
+    private readonly Representation _NullVector;
 
     public Word2VectorService(ApplicationContext applicationContext, IConfiguration config)
     {
         _context = applicationContext;
         _config = config;
         _vocabulary = new Word2VecBinaryReader().Read(Path.GetFullPath(_config["VECTOR_BIN"]));
+        _NullVector = new Representation("null", new float[300]);
     }
     
     public static Word2VectorService GetInstance(ApplicationContext applicationContext, IConfiguration config)
@@ -72,8 +77,98 @@ public class Word2VectorService
     public async Task<string> WordSubtractionAsync(string wordA, string wordB)
     {
         Console.WriteLine($"'{wordA}' - '{wordB}' = ...");
-        var subtractionRepresentation = await Task.Run(() => _vocabulary[wordA].Substract(_vocabulary[wordB]));
-        var closestSubtractions = await Task.Run(() => _vocabulary.Distance(subtractionRepresentation,1));
+        Representation subtractionRepresentation = await Task.Run(() => _vocabulary[wordA].Substract(_vocabulary[wordB]));
+        DistanceTo[] closestSubtractions = await Task.Run(() => _vocabulary.Distance(subtractionRepresentation,1));
         return closestSubtractions[0].Representation.WordOrNull;
+    }
+
+    public async Task<List<string>> WordCalculation(VectorCalculationDto vecCalDto)
+    {
+        Representation resultVector = _NullVector;
+        if (!vecCalDto.Additions.IsNullOrEmpty())
+        {
+            foreach (string word in vecCalDto.Additions)
+            {
+                resultVector = await _addWordToVector(word, resultVector);
+            }
+        }
+        
+        if (!vecCalDto.Subtractions.IsNullOrEmpty())
+        {
+            foreach (string word in vecCalDto.Subtractions)
+            {
+                resultVector = await _subtWordFromVector(word, resultVector);
+            }
+        }
+
+        return _vocabulary
+            .Distance(resultVector, 3)
+            .Select(w => w.Representation.WordOrNull)
+            .ToList();
+    }
+
+    private async Task<Representation> _getWordOrNullVector(string word)
+    {
+        string[] wordForms = new string[]
+        {
+            word, 
+            word.ToLower(),
+            char.ToUpper(word[0]) + word.Substring(1), 
+            word + "s",
+            word + "es",
+            word.ToLower() + "s",
+            char.ToUpper(word[0]) + word.Substring(1) + "es"
+        };
+    
+        foreach (string form in wordForms)
+        {
+            Representation representation = _vocabulary.GetRepresentationOrNullFor(form);
+            if (representation != null)
+            {
+                return representation;
+            }
+        }
+        return new Representation("null", new float[300]);
+    }
+
+    
+    private async Task<Representation> _addVectors(Representation vectorA, Representation vectorB)
+    {
+        float[] resultVector = new float[300];
+        for (int i = 0; i < resultVector.Length; i++)
+        {
+            resultVector[i] = vectorA.NumericVector[i] + vectorB.NumericVector[i];
+        }
+        return new Representation("interMediateResult", resultVector);
+    }
+    
+    private async Task<Representation> _subtVectors(Representation vectorA, Representation vectorB)
+    {
+        float[] resultVector = new float[300];
+        for (int i = 0; i < resultVector.Length; i++)
+        {
+            resultVector[i] = vectorA.NumericVector[i] - vectorB.NumericVector[i];
+        }
+        return new Representation("interMediateResult", resultVector);
+    }
+    
+    private async Task<Representation> _addWordToVector(string word, Representation vectorB)
+    {
+        Representation vectorA = await _getWordOrNullVector(word);
+        if (vectorA == null)
+        {
+            return vectorB;
+        }
+        return await _addVectors(vectorA, vectorB);
+    }
+    
+    private async Task<Representation> _subtWordFromVector(string word, Representation vectorB)
+    {
+        Representation vectorA = await _getWordOrNullVector(word);
+        if (vectorA == null)
+        {
+            return vectorB;
+        }
+        return await _subtVectors(vectorB, vectorA);
     }
 }

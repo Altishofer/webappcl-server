@@ -102,22 +102,10 @@ namespace ToX.Controllers
             return Ok(subtractionWords);
         }
         
-        [HttpGet("wordCalculation")]
+        [HttpPut("wordCalculation")]
         public async Task<IActionResult> GetWordSubtraction([FromBody] VectorCalculationDto vecCalcDto)
         {
-            WordVector result;
-            long distance;
-            
-            if (!vecCalcDto.Subtractions.IsNullOrEmpty())
-            {
-                foreach (string word in vecCalcDto.Subtractions)
-                {
-                    //result = _word2VectorService.WordSubtractionAsync(result, word);
-                }
-            }
-            //var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);
-            //return Ok(subtractionWords);
-            return Ok();
+            return Ok(await _word2VectorService.WordCalculation(vecCalcDto));
         }
         
     }
