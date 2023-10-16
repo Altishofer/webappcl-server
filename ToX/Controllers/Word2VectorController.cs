@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using ToX.DTOs.VectorDto;
 using ToX.Models;
 using ToX.Services;
 using Word2vec.Tools;
@@ -79,13 +81,6 @@ namespace ToX.Controllers
             return Ok(closestWords);
         }
         
-        [HttpGet("closestWordsSQL")]
-        public async Task<IActionResult> GetClosestWordsSQL(string word, int count)
-        {
-            var closestWords = await _word2VectorService.FindClosestWordsAsyncSQL(word, count);
-            return Ok(closestWords);
-        }
-
         [HttpGet("analogy")]
         public async Task<IActionResult> GetAnalogy(string wordA, string wordB, string wordC, int count)
         {
@@ -106,5 +101,24 @@ namespace ToX.Controllers
             var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);
             return Ok(subtractionWords);
         }
+        
+        [HttpGet("wordCalculation")]
+        public async Task<IActionResult> GetWordSubtraction([FromBody] VectorCalculationDto vecCalcDto)
+        {
+            WordVector result;
+            long distance;
+            
+            if (!vecCalcDto.Subtractions.IsNullOrEmpty())
+            {
+                foreach (string word in vecCalcDto.Subtractions)
+                {
+                    //result = _word2VectorService.WordSubtractionAsync(result, word);
+                }
+            }
+            //var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);
+            //return Ok(subtractionWords);
+            return Ok();
+        }
+        
     }
 }

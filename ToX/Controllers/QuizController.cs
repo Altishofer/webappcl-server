@@ -48,44 +48,67 @@ namespace ToX.Controllers
             _roundService = new RoundService(_context, _word2VectorService);
             _answerService = new AnswerService(_context, _word2VectorService);
         }
-        
+
         [HttpGet("GetAllQuizzes")]
-        public async Task<IActionResult> GetAllQuiz()
+        public async Task<IActionResult> GetAllQuizzes()
         {
             List<Quiz> quizzes = await _quizService.GetAllQuizzes();
             return Ok(quizzes);
         }
-        
+
+        [HttpGet("GetAllRounds")]
+        public async Task<IActionResult> GetAllRounds()
+        {
+            List<Round> rounds = await _roundService.GetAllRounds();
+            return Ok(rounds);
+        }
+
+        [HttpGet("GetAllAnswers")]
+        public async Task<IActionResult> GetAllAnswers()
+        {
+            List<Answer> answers = await _answerService.GetAllAnswers();
+            return Ok(answers);
+        }
+
         [HttpPost("CreateQuiz")]
         public async Task<IActionResult> CreateQuiz([FromBody] QuizDto quizDto)
         {
-            if (!ModelState.IsValid){return BadRequest(ModelState);}
-            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             Quiz quiz = await _quizService.CreateQuiz(quizDto);
             QuizDto returnQuizDto = new QuizDto(quiz);
-            return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto});
+            return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto });
         }
-        
+
         [HttpPost("CreateRound")]
         public async Task<IActionResult> CreateRound(RoundDto roundDto)
         {
-            if (!ModelState.IsValid){return BadRequest(ModelState);}
-            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             Round round = await _roundService.CreateRound(roundDto);
             RoundDto returnRoundDto = new RoundDto(round);
-            return CreatedAtAction(nameof(CreateRound), new { returnRoundDto});
+            return CreatedAtAction(nameof(CreateRound), new { returnRoundDto });
         }
-        
+
         [HttpPost("CreateAnswer")]
         public async Task<IActionResult> CreateAnswer(AnswerDto answerDto)
         {
-            if (!ModelState.IsValid){return BadRequest(ModelState);}
-            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             Answer answer = await _answerService.CreateAnswer(answerDto);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
-            return CreatedAtAction(nameof(CreateAnswer), new { returnAnswerDto});
+            return CreatedAtAction(nameof(CreateAnswer), new { returnAnswerDto });
         }
-        
+
         [HttpGet("GetQuiz/{id}")]
         public async Task<IActionResult> GetAllQuiz([FromRoute] long id)
         {
@@ -94,11 +117,25 @@ namespace ToX.Controllers
             {
                 return NotFound("quiz not found");
             }
-            
+
             QuizDto quizDto = new QuizDto(quiz);
             return Ok(new { quizDto });
         }
-        
+
+
+        [HttpGet("GetRound/{id}")]
+        public async Task<IActionResult> GetRound([FromRoute] long id)
+        {
+            Round? round = await _roundService.GetRoundOrNull(id);
+            if (round == null)
+            {
+                return NotFound("round not found");
+            }
+
+            RoundDto roundDto = new RoundDto(round);
+            return Ok(new { roundDto });
+        }
+
         [HttpGet("GetAnswer/{id}")]
         public async Task<IActionResult> GetAnswer([FromRoute] long id)
         {
@@ -107,11 +144,9 @@ namespace ToX.Controllers
             {
                 return NotFound("answer not found");
             }
-            
+
             AnswerDto answerDto = new AnswerDto(answer);
             return Ok(new { answerDto });
         }
     }
-    
-
 }
