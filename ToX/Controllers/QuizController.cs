@@ -38,6 +38,7 @@ namespace ToX.Controllers
         private readonly RoundService _roundService;
         private readonly AnswerService _answerService;
         private readonly Word2VectorService _word2VectorService;
+        private readonly HostService _hostService;
 
         public QuizController(ApplicationContext context, IConfiguration config)
         {
@@ -47,6 +48,7 @@ namespace ToX.Controllers
             _quizService = new QuizService(_context);
             _roundService = new RoundService(_context, _word2VectorService);
             _answerService = new AnswerService(_context, _word2VectorService);
+            _hostService = new HostService(_context, _config);
         }
 
         [HttpGet("GetAllQuizzes")]
@@ -55,11 +57,33 @@ namespace ToX.Controllers
             List<Quiz> quizzes = await _quizService.GetAllQuizzes();
             return Ok(quizzes);
         }
+        
+        [HttpGet("GetAllQuizzesByHost")]
+        [Authorize]
+        public async Task<IActionResult> GetAllQuizzesByHost()
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                Console.WriteLine();
+                return Unauthorized("Invalid credentials.");
+            }
+
+            List<Quiz> quizzes = await _quizService.GetAllQuizzesByUser(claimHost);
+            return Ok(quizzes);
+        }
 
         [HttpGet("GetAllRounds")]
         public async Task<IActionResult> GetAllRounds()
         {
             List<Round> rounds = await _roundService.GetAllRounds();
+            return Ok(rounds);
+        }
+        
+        [HttpGet("GetAllRoundsByQuiz")]
+        public async Task<IActionResult> GetAllRoundsByQuiz([FromQuery(Name= "quizId")] long quizId)
+        {
+            List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             return Ok(rounds);
         }
 
@@ -148,5 +172,16 @@ namespace ToX.Controllers
             AnswerDto answerDto = new AnswerDto(answer);
             return Ok(new { answerDto });
         }
+        
+        [HttpGet("GetAnswerByQuestion/{questionId}")]
+        [Authorize]
+        public async Task<IActionResult> GetAnswerByRoundId([FromRoute] long questionId)
+        {
+            List<Answer> answers = await _answerService.GetAnswersByRoundId(questionId);
+            return Ok(new {answers});
+        }
+        
+        
+        
     }
 }

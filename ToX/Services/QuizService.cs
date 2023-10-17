@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ToX.DTOs;
 using ToX.DTOs.QuizDto;
 using ToX.Models;
 using ToX.Repositories;
@@ -20,6 +21,11 @@ public class QuizService
     public async Task<List<Quiz>> GetAllQuizzes()
     {
         return await _quizRepository.GetAllQuizzes();
+    }
+    
+    public async Task<List<Quiz>> GetAllQuizzesByUser(Models.Host host)
+    {
+        return await _quizRepository.GetQuizzesByHostId(host.hostId);
     }
     
     public async Task<Quiz> CreateQuiz(QuizDto quizDto)

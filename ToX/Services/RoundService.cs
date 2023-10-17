@@ -24,6 +24,16 @@ public class RoundService
     return await _roundRepository.GetAllRounds();
   }
   
+  public async Task<List<Round>> GetAllRoundsByQuiz(Quiz quiz)
+  {
+    return await _roundRepository.GetRoundsByQuizId(quiz.Id);
+  }
+  
+  public async Task<List<Round>> GetAllRoundsByQuiz(long id)
+  {
+    return await _roundRepository.GetRoundsByQuizId(id);
+  }
+  
   public async Task<Round> CreateRound(RoundDto roundDto)
   {
     Round round = roundDto.toRound();

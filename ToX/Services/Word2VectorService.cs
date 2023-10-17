@@ -104,6 +104,7 @@ public class Word2VectorService
         return _vocabulary
             .Distance(resultVector, 3)
             .Select(w => w.Representation.WordOrNull)
+            .Where(w => !vecCalDto.Additions.Any(e => e == w) && !vecCalDto.Subtractions.Any(e => e == w))
             .ToList();
     }
 

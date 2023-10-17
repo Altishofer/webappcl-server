@@ -41,4 +41,15 @@ public class AnswerRepository
         await _context.SaveChangesAsync();
         return answer;
     }
+
+    public async Task<List<Answer>> GetAnswerByRoundId(long roundId)
+    {
+        return _context.Answer.Where(a => a.RoundId == roundId).ToList();
+    }
+    
+    public async Task<Answer?> GetAnswerByRoundIdPlayerId(long roundId, long playerId)
+    {
+        return await _context.Answer.FirstOrDefaultAsync(a => a.RoundId == roundId && a.PlayerId == playerId);
+    }
 }
+

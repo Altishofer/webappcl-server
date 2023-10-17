@@ -35,4 +35,9 @@ public class AnswerService
   {
     return await _answerRepository.GetAnswerById(id);
   }
+  
+  public async Task<List<Answer>> GetAnswersByRoundId(long id)
+  {
+    return await _answerRepository.GetAnswerByRoundId(id);
+  }
 }

@@ -20,6 +20,11 @@ public class RoundRepository
         return _context.Round.ToList();
     }
     
+    public async Task<List<Round>> GetRoundsByQuizId(long quizId)
+    {
+        return _context.Round.Where(h => h.QuizId == quizId).ToList();
+    }
+    
     public async Task<Round?> GetRoundById(long roundId)
     {
         return await _context.Round.FindAsync(roundId);

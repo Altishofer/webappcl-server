@@ -20,6 +20,11 @@ public class QuizRepository
         return _context.Quiz.ToList();
     }
     
+    public async Task<List<Quiz>> GetQuizzesByHostId(long id)
+    {
+        return _context.Quiz.Where(h => h.Id == id).ToList();
+    }
+    
     public async Task<Quiz?> GetQuizById(long quizId)
     {
         return await _context.Quiz.FindAsync(quizId);
