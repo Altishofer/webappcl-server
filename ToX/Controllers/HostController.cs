@@ -47,7 +47,7 @@ namespace ToX.Controllers
             }
 
             await _hostService.CreateHost(hostDTO);
-            return CreatedAtAction(nameof(Register), new { Token = _hostService.GenerateToken(hostDTO) });
+            return CreatedAtAction(nameof(Register), _hostService.GenerateToken(hostDTO));
         }
         
         // POST: api/Host/Login
@@ -63,10 +63,10 @@ namespace ToX.Controllers
             Host? authHost = await _hostService.GetHostOrNull(hostDto);
             if (authHost == null)
             {
-                return Unauthorized("User was not found with given credentials");
+                return Unauthorized("User with given credentials was not found");
             }
             
-            return Ok(new { Token = _hostService.GenerateToken(hostDto) });
+            return Ok(_hostService.GenerateToken(hostDto));
         }
         
         // POST: api/Host/RefreshToken
@@ -80,7 +80,7 @@ namespace ToX.Controllers
                 return Unauthorized("The token could not be validated");
             }
 
-            return Ok(new { Token = _hostService.GenerateToken(claimHost) });
+            return Ok(_hostService.GenerateToken(claimHost));
         }
     }
 }
