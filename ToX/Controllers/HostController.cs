@@ -39,12 +39,11 @@ namespace ToX.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "The credentials are not valid." });
+                return BadRequest("The format of the credentials are not valid");
             }
             if (await _hostService.HostExistsByHostName(hostDTO.hostName))
             {
-                ModelState.AddModelError("HostName", "Hostname is already taken.");
-                return BadRequest(ModelState);
+                return BadRequest("Hostname is already taken, please choose another one");
             }
 
             await _hostService.CreateHost(hostDTO);
@@ -78,7 +77,7 @@ namespace ToX.Controllers
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
             {
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized("The token could not be validated");
             }
 
             return Ok(new { Token = _hostService.GenerateToken(claimHost) });
