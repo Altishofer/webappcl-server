@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs;
-using ToX.DTOs.PlayerDto;
 using ToX.Repositories;
 
 namespace ToX.Services;
@@ -15,7 +10,6 @@ namespace ToX.Services;
 using System;
 using System.Threading.Tasks;
 using ToX.Models;
-using Microsoft.EntityFrameworkCore;
 
 public class HostService
 {

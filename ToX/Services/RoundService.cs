@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ToX.DTOs.RoundDto;
+﻿using ToX.DTOs.RoundDto;
 using ToX.Models;
 using ToX.Repositories;
 
@@ -40,7 +38,7 @@ public class RoundService
     round.Id = await _roundRepository.NextRoundId();
     return await _roundRepository.SaveRound(round);
   }
-    
+  
   public async Task<Round?> GetRoundOrNull(long id)
   {
     return await _roundRepository.GetRoundById(id);

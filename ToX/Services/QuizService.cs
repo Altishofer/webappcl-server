@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ToX.DTOs;
-using ToX.DTOs.QuizDto;
+﻿using ToX.DTOs.QuizDto;
 using ToX.Models;
 using ToX.Repositories;
 

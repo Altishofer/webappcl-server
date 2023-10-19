@@ -1,28 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ToX.DTOs;
 using ToX.Models;
-using ToX.Repositories;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using ToX.DTOs;
-using ToX.Models;
-using ToX.Repositories;
 using ToX.Services;
 using Host = ToX.Models.Host;
 
@@ -58,8 +37,10 @@ namespace ToX.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterHostDTO hostDTO)
         {
-            if (!ModelState.IsValid){return BadRequest(ModelState);}
-            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "The credentials are not valid." });
+            }
             if (await _hostService.HostExistsByHostName(hostDTO.hostName))
             {
                 ModelState.AddModelError("HostName", "Hostname is already taken.");
@@ -75,10 +56,15 @@ namespace ToX.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] RegisterHostDTO hostDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("The format of the credentials were not valid");
+            }
+
             Host? authHost = await _hostService.GetHostOrNull(hostDto);
             if (authHost == null)
             {
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized("User was not found with given credentials");
             }
             
             return Ok(new { Token = _hostService.GenerateToken(hostDto) });
@@ -92,7 +78,6 @@ namespace ToX.Controllers
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
             {
-                Console.WriteLine();
                 return Unauthorized("Invalid credentials.");
             }
 
