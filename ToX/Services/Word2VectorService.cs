@@ -118,7 +118,9 @@ public class Word2VectorService
             word + "s",
             word + "es",
             word.ToLower() + "s",
-            char.ToUpper(word[0]) + word.Substring(1) + "es"
+            char.ToUpper(word[0]) + word.Substring(1) + "es",
+            word.Substring(0, word.Length-1),
+            char.ToUpper(word[0]) + word.Substring(0, word.Length-1)
         };
     
         foreach (string form in wordForms)
