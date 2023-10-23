@@ -58,7 +58,7 @@ public class HostService
         {
             hostnameClaim = context.Claims.FirstOrDefault(c => c.Type == "hostName").Value;
             passwordClaim = context.Claims.FirstOrDefault(c => c.Type == "hostPassword").Value;
-            idClaim = context.Claims.FirstOrDefault(c => c.Type == "hostId").Value;
+            //idClaim = context.Claims.FirstOrDefault(c => c.Type == "hostId").Value;
         } catch (Exception e)
         {
             Console.WriteLine(e.Message);
