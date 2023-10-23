@@ -17,13 +17,18 @@ public class Player
   [Column("playername")]
   public string PlayerName { get; set; }
 
+  [Required] 
+  [Column("quizid")]
+  public long QuizId { get; set; }
+
   public Player()
   {
   }
 
-  public Player(long id, string playerName)
+  public Player(long id, string playerName, long quizId)
   {
     Id = id;
     PlayerName = playerName;
+    QuizId = quizId;
   }
 }

@@ -20,14 +20,14 @@ public class PlayerRepository
         return _context.Player.ToList();
     }
     
-    public async Task<Player?> GetPlayerByPlayerName(string playerName)
+    public async Task<Player?> GetPlayer(string playerName, long quizId)
     {
-        return await _context.Player.FirstOrDefaultAsync(h => h.PlayerName == playerName);
+        return await _context.Player.FirstOrDefaultAsync(h => h.PlayerName == playerName && h.QuizId == quizId);
     }
     
-    public async Task<bool> PlayerExistsByPlayerName(string PlayerName)
+    public async Task<bool> PlayerExists(string playerName, long quizId)
     {
-        return await _context.Player.AnyAsync(h => h.PlayerName == PlayerName);
+        return await _context.Player.AnyAsync(h => h.PlayerName == playerName && h.QuizId == quizId);
     }
     
     public async Task<long> NextPlayerId()

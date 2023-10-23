@@ -13,6 +13,9 @@ public class ReturnPlayerDto
     [Required]
     public string PlayerName { get; set; }
     
+    [Required]
+    public long QuizId { get; set; }
+    
     [JsonConstructor]
     public ReturnPlayerDto(){}
 
@@ -20,11 +23,12 @@ public class ReturnPlayerDto
     {
         Id = player.Id;
         PlayerName = player.PlayerName;
+        QuizId = player.QuizId;
     }
 
     public Player toEntity()
     {
-        return new Player(Id, PlayerName);
+        return new Player(Id, PlayerName, QuizId);
     }
     
 }
