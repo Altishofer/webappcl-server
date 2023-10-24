@@ -9,6 +9,8 @@ public class RegisterPlayerDto
 {
     [Required]
     public string PlayerName { get; set; }
+    [Required]
+    public long QuizId { get; set; }
     
     [JsonConstructor]
     public RegisterPlayerDto(){}
@@ -22,6 +24,7 @@ public class RegisterPlayerDto
     {
         Player player = new Player();
         player.PlayerName = PlayerName;
+        player.QuizId = QuizId;
         return player;
     }
     

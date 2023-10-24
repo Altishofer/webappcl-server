@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using ToX.DTOs;
 using ToX.Models;
 
 using ToX.DTOs.QuizDto;
 using ToX.DTOs.RoundDto;
+using ToX.Hubs;
 using ToX.Services;
 using Host = ToX.Models.Host;
 
@@ -21,6 +23,8 @@ namespace ToX.Controllers
         private readonly AnswerService _answerService;
         private readonly Word2VectorService _word2VectorService;
         private readonly HostService _hostService;
+        private readonly QuizHub _quizHub;
+        private readonly PlayerService _playerService;
 
         public QuizController(ApplicationContext context, IConfiguration config)
         {
@@ -31,6 +35,8 @@ namespace ToX.Controllers
             _roundService = new RoundService(_context, _word2VectorService);
             _answerService = new AnswerService(_context, _word2VectorService);
             _hostService = new HostService(_context, _config);
+            _playerService = new PlayerService(_context, _config);
+            _quizHub = new QuizHub(_playerService, _quizService, _roundService);
         }
 
         [HttpGet("GetAllQuizzes")]

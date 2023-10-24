@@ -20,6 +20,7 @@ public class Player
   [Required] 
   [Column("quizid")]
   public long QuizId { get; set; }
+  
 
   public Player()
   {

@@ -26,6 +26,7 @@
 
 
   <ItemGroup>
+    <Folder Include="DTOs\socketDto\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

@@ -28,7 +28,7 @@ namespace ToX.Controllers
             _context = context;
             _configuration = config;
             _tokenSecret = _configuration["JWT_SETTINGS_KEY"];
-            _playerService = new PlayerService(_context);
+            _playerService = new PlayerService(_context, _configuration);
         }
         
         // POST: api/Player/Register
@@ -38,15 +38,14 @@ namespace ToX.Controllers
         {
             if (!ModelState.IsValid){return BadRequest(ModelState);}
             
-            if (await _playerService.PlayerExistsByPlayerName(registerPlayerDto.PlayerName))
+            if (await _playerService.PlayerExists(registerPlayerDto))
             {
-                ModelState.AddModelError("PlayerName", "PlayerName is already taken.");
-                return BadRequest(ModelState);
+                return BadRequest($"Name '{registerPlayerDto.PlayerName}' is already taken, please choose another one");
             }
 
             Player player = await _playerService.CreatePlayer(registerPlayerDto);
             
-            return CreatedAtAction(nameof(Register), new ReturnPlayerDto(player));
+            return Ok(_playerService.GenerateToken(registerPlayerDto));
         }
         
         // Get: api/Player
