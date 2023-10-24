@@ -13,46 +13,41 @@ namespace ToX.Hubs
     using System.Threading.Tasks;
 
     public class QuizHub : Hub
-    {
-        private readonly PlayerService _playerService;
-        private readonly QuizService _quizService;
-        private readonly RoundService _roundService;
-        
-        private Dictionary<string, List<string>> _groups = new Dictionary<string, List<string>>();
+    { 
+        private IHubContext<QuizHub> _hubContext;
 
-        public QuizHub(PlayerService playerService, QuizService quizService, RoundService roundService)
+        public QuizHub(IHubContext<QuizHub> context)
         {
-            _playerService = playerService;
-            _quizService = quizService;
-            _roundService = roundService;
+            _hubContext = context;
         }
 
         public async Task JoinGroup(string groupName, string playerName)
         {
             Console.WriteLine("Join Group: " + groupName + " Player: " + playerName);
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await _hubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
         public async Task SendMessageToGroup(string groupName, string message)
         {
-            Console.WriteLine("group: " + groupName + " message: " + message);
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+            Console.WriteLine($"SendMessageToGroup  -> {message}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage", message);
         }
 
         public async Task SendNextRoundToGroup(string groupName, string round)
         {
-            await Clients.Group(groupName).SendAsync("ReceiveRound", round);
+            Console.WriteLine($"SendNextRoundToGroup -> {round}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveRound", round);
         }
 
-        public async Task SendPlayersToGroup(string groupName)
+        public async Task SendPlayersToGroup(string groupName, string playerString)
         {
-            List<Player> players = await _playerService.GetPlayersByQuiz(long.Parse(groupName));
-            await Clients.Group(groupName).SendAsync("ReceivePlayers", string.Join(" ", players.Select(p => p.PlayerName)));
+            Console.WriteLine($"SendPlayerToGroup -> {playerString}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceivePlayers", playerString);
         }
         
         public async Task LeaveGroup(string groupName)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+            await _hubContext.Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
     }
 }

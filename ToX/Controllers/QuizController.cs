@@ -26,7 +26,7 @@ namespace ToX.Controllers
         private readonly QuizHub _quizHub;
         private readonly PlayerService _playerService;
 
-        public QuizController(ApplicationContext context, IConfiguration config)
+        public QuizController(ApplicationContext context, IConfiguration config, IHubContext<QuizHub> hubContext)
         {
             _context = context;
             _config = config;
@@ -36,7 +36,7 @@ namespace ToX.Controllers
             _answerService = new AnswerService(_context, _word2VectorService);
             _hostService = new HostService(_context, _config);
             _playerService = new PlayerService(_context, _config);
-            _quizHub = new QuizHub(_playerService, _quizService, _roundService);
+            _quizHub = new QuizHub(hubContext);
         }
 
         [HttpGet("GetAllQuizzes")]
@@ -119,6 +119,16 @@ namespace ToX.Controllers
             Answer answer = await _answerService.CreateAnswer(answerDto);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
             return CreatedAtAction(nameof(CreateAnswer), new { returnAnswerDto });
+        }
+        
+        [HttpGet("GetPlayers/{quizId}")]
+        public async Task<ActionResult<string>> GetPlayersByQuiz([FromRoute] long quizId)
+        {
+            List<Player> playerList = await _playerService.GetPlayersByQuiz(quizId);
+            List<string> playerNames = playerList.Select(p => p.PlayerName).ToList();
+            string message = string.Join(" ", playerNames);
+            await _quizHub.SendPlayersToGroup(quizId.ToString(), message);
+            return Ok(new {message});
         }
 
         [HttpGet("GetQuiz/{id}")]
