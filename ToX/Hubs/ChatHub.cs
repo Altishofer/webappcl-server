@@ -1,4 +1,5 @@
-﻿using ToX.Repositories;
+﻿using ToX.Models;
+using ToX.Repositories;
 using ToX.Services;
 
 namespace ToX.Hubs
@@ -24,19 +25,9 @@ namespace ToX.Hubs
 
         public async Task JoinGroup(string groupName, string playerName)
         {
-            
-            if (_groups.ContainsKey(groupName) && !_groups[groupName].Contains(playerName))
-            {
-                _groups[groupName].Add(playerName);
-            }
-            else if (!_groups.ContainsKey(groupName))
-            {
-                _groups[groupName] = new List<string>() { playerName };
-            }
-
+            List<Player> players = await _playerService.GetPlayersByQuiz(long.Parse(groupName));
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            Console.WriteLine("group: " + groupName + " connectionId: " + string.Join(" ", _groups[groupName]));
-            await Clients.Group(groupName).SendAsync("ReceivePlayers", string.Join(" ", _groups[groupName]));
+            await Clients.Group(groupName).SendAsync("ReceivePlayers", string.Join(" ", players.Select(p => p.PlayerName)));
         }
 
         public async Task SendMessageToGroup(string groupName, string message)

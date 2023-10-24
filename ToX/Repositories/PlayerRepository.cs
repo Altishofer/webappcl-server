@@ -30,6 +30,11 @@ public class PlayerRepository
         return await _context.Player.AnyAsync(h => h.PlayerName == PlayerName);
     }
     
+    public async Task<List<Player>> GetPlayersByQuiz(long quizIde)
+    {
+        return _context.Player.Where(h => h.QuizId == quizIde).ToList();
+    }
+    
     public async Task<long> NextPlayerId()
     {
         return await _context.Player.AnyAsync() ? (await _context.Player.MaxAsync(u => u.Id)) + 1 : 0;

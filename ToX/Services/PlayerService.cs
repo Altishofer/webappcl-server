@@ -38,4 +38,9 @@ public class PlayerService
     {
         return await _playerRepository.GetAllPlayers();
     }
+    
+    public async Task<List<Player>> GetPlayersByQuiz(long quizId)
+    {
+        return await _playerRepository.GetPlayersByQuiz(quizId);
+    }
 }
