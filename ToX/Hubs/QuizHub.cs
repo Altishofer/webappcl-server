@@ -47,6 +47,7 @@ namespace ToX.Hubs
         
         public async Task LeaveGroup(string groupName)
         {
+            Console.WriteLine($"LeaveGroup -> {groupName}");
             await _hubContext.Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
     }

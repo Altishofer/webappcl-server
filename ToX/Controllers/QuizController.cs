@@ -155,7 +155,7 @@ namespace ToX.Controllers
             }
 
             RoundDto roundDto = new RoundDto(round);
-            return Ok(new { roundDto });
+            return Ok(roundDto);
         }
 
         [HttpGet("GetAnswer/{id}")]
