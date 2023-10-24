@@ -1,22 +1,58 @@
-﻿namespace ToX.Hubs;
+﻿using ToX.Repositories;
+using ToX.Services;
 
-using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-
-public class ChatHub : Hub
+namespace ToX.Hubs
 {
-    public async Task JoinGroup(string groupName)
-    {
-        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-    }
+    using Microsoft.AspNetCore.SignalR;
+    using System.Threading.Tasks;
 
-    public async Task LeaveGroup(string groupName)
+    public class ChatHub : Hub
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-    }
+        private readonly PlayerService _playerService;
+        private readonly QuizService _quizService;
+        private readonly RoundService _roundService;
 
-    public async Task SendMessageToGroup(string groupName, string message)
-    {
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+
+        private Dictionary<string, List<string>> _groups = new Dictionary<string, List<string>>();
+
+        public ChatHub(PlayerService playerService, QuizService quizService, RoundService roundService)
+        {
+            _playerService = playerService;
+            _quizService = quizService;
+            _roundService = roundService;
+        }
+
+        public async Task JoinGroup(string groupName, string playerName)
+        {
+            
+            if (_groups.ContainsKey(groupName) && !_groups[groupName].Contains(playerName))
+            {
+                _groups[groupName].Add(playerName);
+            }
+            else if (!_groups.ContainsKey(groupName))
+            {
+                _groups[groupName] = new List<string>() { playerName };
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            Console.WriteLine("group: " + groupName + " connectionId: " + string.Join(" ", _groups[groupName]));
+            await Clients.Group(groupName).SendAsync("ReceivePlayers", string.Join(" ", _groups[groupName]));
+        }
+
+        public async Task SendMessageToGroup(string groupName, string message)
+        {
+            Console.WriteLine("group: " + groupName + " message: " + message);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+        }
+
+        public async Task SendNextRoundToGroup(string groupName, string message)
+        {
+            await Clients.Group(groupName).SendAsync("ReceiveRound", message);
+        }
+
+        public async Task SendPlayersToGroup(string groupName, string message)
+        {
+            await Clients.Group(groupName).SendAsync("ReceivePlayers", message);
+        }
     }
 }

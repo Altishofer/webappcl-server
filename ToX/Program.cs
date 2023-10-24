@@ -76,7 +76,7 @@ var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 dbContext.Database.Migrate();
 
 app.MapControllers();
-app.MapHub<ChatHub>("chatHub");
+app.MapHub<ChatHub>("quizHub");
 
 app.UseCors(x => x
     .AllowAnyOrigin() //.WithOrigins("http://localhost:4200", "http://172.23.49.21:8017")
