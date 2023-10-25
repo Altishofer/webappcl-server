@@ -5,6 +5,7 @@ using ToX.DTOs;
 using ToX.Models;
 
 using ToX.DTOs.QuizDto;
+using ToX.DTOs.ResultDto;
 using ToX.DTOs.RoundDto;
 using ToX.Hubs;
 using ToX.Services;
@@ -108,18 +109,42 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(CreateRound), new { returnRoundDto });
         }
 
+        [AllowAnonymous]
         [HttpPost("CreateAnswer")]
         public async Task<IActionResult> CreateAnswer(AnswerDto answerDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid answer");
+            }
+            
+            if (await _answerService.AnswerExists(answerDto.PlayerName, answerDto.RoundId))
+            {
+                return BadRequest("Answer already exists");
             }
 
             Answer answer = await _answerService.CreateAnswer(answerDto);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
-            return CreatedAtAction(nameof(CreateAnswer), new { returnAnswerDto });
+            return CreatedAtAction(nameof(CreateAnswer), returnAnswerDto);
         }
+
+        [HttpGet("Ranking/{quizId}/{roundId}")]
+        public async Task<ActionResult<WaitResultDto>> GetWaitRanking([FromRoute] long quizId, [FromRoute] long roundId)
+        {
+            List<Answer> answered = await _answerService.GetAnswersByRoundId(roundId);
+            List<Player> all = await _playerService.GetPlayersByQuiz(quizId);
+            
+            List<string> answeredPlayers = answered.Select(a => a.PlayerName).ToList();
+            List<string> allPlayers = all.Select(p => p.PlayerName).ToList();
+            
+            List<string> notAnsweredPlayers = allPlayers.Except(answeredPlayers).ToList();
+            Console.WriteLine(notAnsweredPlayers);
+            WaitResultDto waitResultDto = new WaitResultDto(notAnsweredPlayers, answeredPlayers);
+            
+            await _quizHub.SendWaitRankingToGroup(quizId.ToString(), waitResultDto);
+            return Ok(waitResultDto);
+        }
+        
         
         [HttpGet("GetPlayers/{quizId}")]
         public async Task<ActionResult<string>> GetPlayersByQuiz([FromRoute] long quizId)
@@ -178,8 +203,5 @@ namespace ToX.Controllers
             List<Answer> answers = await _answerService.GetAnswersByRoundId(questionId);
             return Ok(new {answers});
         }
-        
-        
-        
     }
 }

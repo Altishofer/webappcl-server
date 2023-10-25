@@ -36,6 +36,11 @@ public class AnswerService
     return await _answerRepository.GetAnswerById(id);
   }
   
+  public async Task<bool> AnswerExists(string playerName, long roundId)
+  {
+    return await _answerRepository.AnswerExistsByPlayerRound(playerName, roundId);
+  }
+  
   public async Task<List<Answer>> GetAnswersByRoundId(long id)
   {
     return await _answerRepository.GetAnswerByRoundId(id);

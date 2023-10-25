@@ -38,6 +38,12 @@ namespace ToX.Hubs
             Console.WriteLine($"SendNextRoundToGroup -> {round}");
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveRound", round);
         }
+        
+        public async Task SendWaitRankingToGroup(string groupName, WaitResultDto resultDto)
+        {
+            Console.WriteLine($"SendWaitRankingToGroup -> {resultDto}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveWaitResult", resultDto);
+        }
 
         public async Task SendPlayersToGroup(string groupName, string playerString)
         {

@@ -22,9 +22,14 @@ public class AnswerRepository
         return await _context.Answer.FindAsync(answerId);
     }
     
+    public async Task<bool> AnswerExistsByPlayerRound(string playerName, long roundId)
+    {
+        return await _context.Answer.FirstOrDefaultAsync(h => h.PlayerName == playerName && h.RoundId == roundId) != null;
+    }
+    
     public async Task<bool> AnswerExistsById(long answerId)
     {
-        return await _context.Answer.FirstOrDefaultAsync(h => h.Id == answerId) == null;
+        return await _context.Answer.FirstOrDefaultAsync(h => h.Id == answerId) != null;
     }
 
     public async Task<long> NextAnswerId()
@@ -44,9 +49,9 @@ public class AnswerRepository
         return _context.Answer.Where(a => a.RoundId == roundId).ToList();
     }
     
-    public async Task<Answer?> GetAnswerByRoundIdPlayerId(long roundId, long playerId)
+    public async Task<Answer?> GetAnswerByRoundIdPlayerId(long roundId, string playerName)
     {
-        return await _context.Answer.FirstOrDefaultAsync(a => a.RoundId == roundId && a.PlayerId == playerId);
+        return await _context.Answer.FirstOrDefaultAsync(a => a.RoundId == roundId && a.PlayerName == playerName);
     }
 }
 
