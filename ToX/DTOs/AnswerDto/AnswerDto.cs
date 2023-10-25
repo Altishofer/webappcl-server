@@ -19,13 +19,11 @@ public class AnswerDto
   [Required]
   public string PlayerName { get; set; }
   
-  public string AnswerTarget { get; set; }
+  [Required]
+  public List<string> Subtractions { get; set; }
   
   [Required]
-  public string[] Subtractions { get; set; }
-  
-  [Required]
-  public string[] Additions { get; set; }
+  public List<string> Additions { get; set; }
     
   [JsonConstructor]
   public AnswerDto(){}
@@ -36,7 +34,6 @@ public class AnswerDto
     QuizId = answer.QuizId;
     RoundId = answer.RoundId;
     PlayerName = answer.PlayerName;
-    AnswerTarget = answer.AnswerTarget;
     Subtractions = answer.Subtractions;
     Additions = answer.Additions;
   }
@@ -45,7 +42,6 @@ public class AnswerDto
   {
     Answer answer = new Answer();
     answer.RoundId = RoundId;
-    answer.AnswerTarget = AnswerTarget;
     answer.PlayerName = PlayerName;
     answer.QuizId = QuizId;
     answer.Additions = Additions;

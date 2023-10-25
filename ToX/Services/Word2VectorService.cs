@@ -42,6 +42,12 @@ public class Word2VectorService
         return _instance;
     }
     
+    public async Task<double> FindDistance(string word, Representation vector)
+    {
+        Representation vectorB = await _getWordOrNullVector(word);
+        return vectorB.GetCosineDistanceTo(vector).DistanceValue;
+    }
+    
     public async Task<List<string>> FindClosestWordsAsync(string word, int count)
     {
         Console.WriteLine($"top {count} closest to '{word}' words:");
@@ -52,6 +58,13 @@ public class Word2VectorService
             result.Add(neighbor.Representation.WordOrNull);
         }
         return result;
+    }
+    
+    public async Task<float[]> FindClosestVectorAsync(string word)
+    {
+        Representation vector = await _getWordOrNullVector(word);
+        DistanceTo[] closest = await Task.Run(() => _vocabulary.Distance(word, 1));
+        return closest[0].Representation.NumericVector;
     }
 
     public async Task<List<WordVector>> AnalogyAsync(string wordA, string wordB, string wordC, int count)
@@ -82,20 +95,20 @@ public class Word2VectorService
         return closestSubtractions[0].Representation.WordOrNull;
     }
 
-    public async Task<List<string>> WordCalculation(VectorCalculationDto vecCalDto)
+    public async Task<List<string>> WordCalculation(List<string> addList, List<string> subList)
     {
         Representation resultVector = _NullVector;
-        if (!vecCalDto.Additions.IsNullOrEmpty())
+        if (!addList.IsNullOrEmpty())
         {
-            foreach (string word in vecCalDto.Additions)
+            foreach (string word in addList)
             {
                 resultVector = await _addWordToVector(word, resultVector);
             }
         }
         
-        if (!vecCalDto.Subtractions.IsNullOrEmpty())
+        if (!subList.IsNullOrEmpty())
         {
-            foreach (string word in vecCalDto.Subtractions)
+            foreach (string word in subList)
             {
                 resultVector = await _subtWordFromVector(word, resultVector);
             }
@@ -104,7 +117,7 @@ public class Word2VectorService
         return _vocabulary
             .Distance(resultVector, 3)
             .Select(w => w.Representation.WordOrNull)
-            .Where(w => !vecCalDto.Additions.Any(e => e == w) && !vecCalDto.Subtractions.Any(e => e == w))
+            .Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
             .ToList();
     }
 

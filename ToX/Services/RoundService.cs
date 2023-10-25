@@ -36,6 +36,7 @@ public class RoundService
   {
     Round round = roundDto.toRound();
     round.Id = await _roundRepository.NextRoundId();
+    round.RoundTargetVector = await _word2VectorService.FindClosestVectorAsync(round.RoundTarget);
     return await _roundRepository.SaveRound(round);
   }
   

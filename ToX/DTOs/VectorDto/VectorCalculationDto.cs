@@ -6,14 +6,14 @@ namespace ToX.DTOs.VectorDto;
 public class VectorCalculationDto
 {
 
-  public string?[] Additions { get; set; }
+  public List<string>? Additions { get; set; }
 
-  public string?[] Subtractions { get; set; }
+  public List<string>? Subtractions { get; set; }
   
   [JsonConstructor]
   public VectorCalculationDto(){}
 
-  public VectorCalculationDto(string?[] additions, string?[] subtractions)
+  public VectorCalculationDto(List<string>? additions, List<string>? subtractions)
   {
     Additions = additions;
     Subtractions = subtractions;

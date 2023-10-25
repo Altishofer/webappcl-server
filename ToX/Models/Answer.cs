@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Word2vec.Tools;
 
 namespace ToX.Models;
 
@@ -23,29 +24,38 @@ public class Answer
   [Required]
   [Column("playername")]
   public string PlayerName { get; set; }
-    
-  [Required]
-  [Column("answertarget")]
-  public string AnswerTarget { get; set; }
   
   [Required]
   [Column("subtractions")]
-  public string[] Subtractions { get; set; }
+  public List<string> Subtractions { get; set; }
   
   [Required]
   [Column("additions")]
-  public string[] Additions { get; set; }
+  public List<string> Additions { get; set; }
+  
+  [Required]
+  [Column("answertarget")]
+  public List<string> AnswerTarget { get; set; }
+  
+  [Required]
+  [Column("distance")]
+  public double Distance { get; set; }
+  
+  [Column("points")]
+  public long Points { get; set; }
     
   public Answer(){}
 
-  public Answer(long id, long roundId, string playerName, string answerTarget, long quizId, string[] additions, string[] subtractions)
+  public Answer(long id, long roundId, string playerName, long quizId, List<string> additions, List<string> subtractions, List<string> answerTarget, long points, float distance)
   {
     Id = id;
     RoundId = roundId;
     PlayerName = playerName;
-    AnswerTarget = answerTarget;
     QuizId = quizId;
     Subtractions = subtractions;
     Additions = additions;
+    Distance = distance;
+    Points = points;
+    AnswerTarget = answerTarget;
   }
 }

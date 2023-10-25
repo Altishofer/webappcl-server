@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using ToX.Models;
+using Word2vec.Tools;
 
 namespace ToX.DTOs.RoundDto;
 
@@ -15,7 +16,7 @@ public class RoundDto
   [Required]
   public string RoundTarget { get; set; }
   
-  public string[] ForbiddenWords { get; set; }
+  public List<string> ForbiddenWords { get; set; }
     
   [JsonConstructor]
   public RoundDto(){}

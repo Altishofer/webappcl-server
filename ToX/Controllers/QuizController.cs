@@ -101,12 +101,12 @@ namespace ToX.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid round");
             }
 
             Round round = await _roundService.CreateRound(roundDto);
             RoundDto returnRoundDto = new RoundDto(round);
-            return CreatedAtAction(nameof(CreateRound), new { returnRoundDto });
+            return CreatedAtAction(nameof(CreateRound), returnRoundDto);
         }
 
         [AllowAnonymous]
@@ -123,13 +123,25 @@ namespace ToX.Controllers
                 return BadRequest("Answer already exists");
             }
 
-            Answer answer = await _answerService.CreateAnswer(answerDto);
+            Round? round = await _roundService.GetRoundOrNull(answerDto.RoundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(answerDto.QuizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+            
+            Answer answer = await _answerService.CreateAnswer(answerDto, round.RoundTargetVector);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
             return CreatedAtAction(nameof(CreateAnswer), returnAnswerDto);
         }
 
-        [HttpGet("Ranking/{quizId}/{roundId}")]
-        public async Task<ActionResult<WaitResultDto>> GetWaitRanking([FromRoute] long quizId, [FromRoute] long roundId)
+        [HttpGet("WaitResult/{quizId}/{roundId}")]
+        public async Task<ActionResult<WaitResultDto>> GetWaitResult([FromRoute] long quizId, [FromRoute] long roundId)
         {
             List<Answer> answered = await _answerService.GetAnswersByRoundId(roundId);
             List<Player> all = await _playerService.GetPlayersByQuiz(quizId);
@@ -143,6 +155,27 @@ namespace ToX.Controllers
             
             await _quizHub.SendWaitRankingToGroup(quizId.ToString(), waitResultDto);
             return Ok(waitResultDto);
+        }
+        
+        [HttpGet("IntermediateResult/{quizId}/{roundId}")]
+        public async Task<ActionResult<WaitResultDto>> GetIntermediateResult([FromRoute] long quizId, [FromRoute] long roundId)
+        {
+            Round? round = await _roundService.GetRoundOrNull(roundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+
+            List<Answer> answers = await _answerService.GetAnswersByRoundId(roundId);
+            List<IntermediateResultDto> intermediateResultDtos = answers.Select(a => new IntermediateResultDto(a)).ToList();
+            intermediateResultDtos.Sort((a, b) => a.Points > b.Points ? -1 : 1);
+            return Ok(intermediateResultDtos);
         }
         
         

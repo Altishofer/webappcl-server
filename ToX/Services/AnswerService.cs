@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ToX.DTOs;
 using ToX.Models;
 using ToX.Repositories;
+using Word2vec.Tools;
 
 namespace ToX.Services;
 
@@ -24,10 +25,14 @@ public class AnswerService
     return await _answerRepository.GetAllAnswers();
   }
   
-  public async Task<Answer> CreateAnswer(AnswerDto answerDto)
+  public async Task<Answer> CreateAnswer(AnswerDto answerDto, float[] target)
   {
+    Representation targetRepresentation = new Representation("target", target);
     Answer answer = answerDto.toAnswer();
     answer.Id = await _answerRepository.NextAnswerId();
+    answer.AnswerTarget = await _word2VectorService.WordCalculation(answerDto.Additions, answerDto.Subtractions);
+    answer.Distance = await _word2VectorService.FindDistance(answer.AnswerTarget[0], targetRepresentation);
+    answer.Points = (long) (1 + answer.Distance) / 2 * 100;
     return await _answerRepository.SaveAnswer(answer);
   }
     

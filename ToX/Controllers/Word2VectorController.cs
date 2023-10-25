@@ -105,7 +105,7 @@ namespace ToX.Controllers
         [HttpPut("wordCalculation")]
         public async Task<IActionResult> GetWordSubtraction([FromBody] VectorCalculationDto vecCalcDto)
         {
-            return Ok(await _word2VectorService.WordCalculation(vecCalcDto));
+            return Ok(await _word2VectorService.WordCalculation(vecCalcDto.Additions, vecCalcDto.Subtractions));
         }
         
     }
