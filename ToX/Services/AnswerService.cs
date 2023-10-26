@@ -32,7 +32,7 @@ public class AnswerService
     answer.Id = await _answerRepository.NextAnswerId();
     answer.AnswerTarget = await _word2VectorService.WordCalculation(answerDto.Additions, answerDto.Subtractions);
     answer.Distance = await _word2VectorService.FindDistance(answer.AnswerTarget[0], targetRepresentation);
-    answer.Points = (long) (1 + answer.Distance) / 2 * 100;
+    answer.Points = (long) ((1 + answer.Distance) / 2 * 100);
     return await _answerRepository.SaveAnswer(answer);
   }
     

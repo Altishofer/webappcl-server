@@ -117,7 +117,7 @@ public class Word2VectorService
         return _vocabulary
             .Distance(resultVector, 3)
             .Select(w => w.Representation.WordOrNull)
-            .Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
+            //.Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
             .ToList();
     }
 
