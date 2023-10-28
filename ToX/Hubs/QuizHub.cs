@@ -47,8 +47,8 @@ namespace ToX.Hubs
         
         public async Task SendIntermediateResultToGroup(string groupName, List<IntermediateResultDto> resultDto)
         {
-            Console.WriteLine($"SendWaitRankingToGroup -> {resultDto}");
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveWaitResult", resultDto);
+            Console.WriteLine($"SendIntermediateResultToGroup -> {resultDto}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveIntermediateResult", resultDto);
         }
 
         public async Task SendPlayersToGroup(string groupName, string playerString)

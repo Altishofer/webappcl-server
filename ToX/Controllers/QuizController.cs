@@ -173,6 +173,7 @@ namespace ToX.Controllers
             
             Answer answer = await _answerService.CreateAnswer(answerDto, round.RoundTargetVector);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
+            await GetWaitResult(answerDto.QuizId, answerDto.RoundId);
             return CreatedAtAction(nameof(CreateAnswer), returnAnswerDto);
         }
 
