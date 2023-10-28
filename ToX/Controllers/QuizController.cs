@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +77,20 @@ namespace ToX.Controllers
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             return Ok(rounds);
         }
+        
+        [HttpGet("GetAllRoundIdsByQuiz/{quizId}")]
+        public async Task<IActionResult> GetAllRoundIdsByQuiz([FromRoute] long quizId)
+        {
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+            
+            List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
+            List<long> roundIds = rounds.Select(r => r.Id).ToList();
+            return Ok(roundIds);
+        }
 
         [HttpGet("GetAllAnswers")]
         public async Task<IActionResult> GetAllAnswers()
@@ -95,6 +110,26 @@ namespace ToX.Controllers
             Quiz quiz = await _quizService.CreateQuiz(quizDto);
             QuizDto returnQuizDto = new QuizDto(quiz);
             return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto });
+        }
+        
+        [HttpPut("PushRound/{roundId}")]
+        public async Task<IActionResult> PushRound([FromRoute] long roundId)
+        {
+            Round? round = await _roundService.GetRoundOrNull(roundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(round.QuizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+
+            await _quizHub.SendNextRoundToGroup(quiz.Id.ToString(), roundId.ToString());
+            string response = $"Round {roundId} was broadcasted to {quiz.Id}";
+            return Ok(new {response});
         }
 
         [HttpPost("CreateRound")]
@@ -176,6 +211,7 @@ namespace ToX.Controllers
             List<Answer> answers = await _answerService.GetAnswersByRoundId(roundId);
             List<IntermediateResultDto> intermediateResultDtos = answers.Select(a => new IntermediateResultDto(a)).ToList();
             intermediateResultDtos.Sort((a, b) => a.Points > b.Points ? -1 : 1);
+            _quizHub.SendIntermediateResultToGroup(quizId.ToString(), intermediateResultDtos);
             return Ok(intermediateResultDtos);
         }
         
@@ -186,7 +222,6 @@ namespace ToX.Controllers
             List<Player> playerList = await _playerService.GetPlayersByQuiz(quizId);
             List<string> playerNames = playerList.Select(p => p.PlayerName).ToList();
             string message = string.Join(" ", playerNames);
-            await _quizHub.SendPlayersToGroup(quizId.ToString(), message);
             return Ok(new {message});
         }
 

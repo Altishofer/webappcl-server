@@ -21,9 +21,9 @@ namespace ToX.Hubs
             _hubContext = context;
         }
 
-        public async Task JoinGroup(string groupName, string playerName)
+        public async Task JoinGroup(string groupName)
         {
-            Console.WriteLine("Join Group: " + groupName + " Player: " + playerName);
+            Console.WriteLine("Join Group: " + groupName);
             await _hubContext.Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
@@ -40,6 +40,12 @@ namespace ToX.Hubs
         }
         
         public async Task SendWaitRankingToGroup(string groupName, WaitResultDto resultDto)
+        {
+            Console.WriteLine($"SendWaitRankingToGroup -> {resultDto}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveWaitResult", resultDto);
+        }
+        
+        public async Task SendIntermediateResultToGroup(string groupName, List<IntermediateResultDto> resultDto)
         {
             Console.WriteLine($"SendWaitRankingToGroup -> {resultDto}");
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveWaitResult", resultDto);
