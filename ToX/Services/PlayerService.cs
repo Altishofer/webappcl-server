@@ -82,4 +82,26 @@ public class PlayerService
             
         return jwt;
     }
+    
+    public async Task<Player?> VerifyPlayer(ClaimsPrincipal context)
+    {
+        string? playerNameClaim;
+        string? quizIdClaim;
+        try
+        {
+            playerNameClaim = context.Claims.FirstOrDefault(c => c.Type == "playerName").Value;
+            quizIdClaim = context.Claims.FirstOrDefault(c => c.Type == "quizId").Value;
+            //idClaim = context.Claims.FirstOrDefault(c => c.Type == "hostId").Value;
+        } catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return null;
+        }
+
+        RegisterPlayerDto claimDto = new RegisterPlayerDto(playerNameClaim, long.Parse(quizIdClaim));
+
+        Player? player = await GetPlayerOrNull(claimDto);
+
+        return player ?? null ;
+    }
 }

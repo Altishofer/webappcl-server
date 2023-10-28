@@ -56,14 +56,14 @@ namespace ToX.Controllers
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
             {
-                Console.WriteLine();
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized("The token could not be validated");
             }
 
             List<Quiz> quizzes = await _quizService.GetAllQuizzesByUser(claimHost);
             return Ok(quizzes);
         }
 
+        // ToDo: remove helper method
         [HttpGet("GetAllRounds")]
         public async Task<IActionResult> GetAllRounds()
         {
@@ -72,15 +72,27 @@ namespace ToX.Controllers
         }
         
         [HttpGet("GetAllRoundsByQuiz")]
+        [Authorize]
         public async Task<IActionResult> GetAllRoundsByQuiz([FromQuery(Name= "quizId")] long quizId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             return Ok(rounds);
         }
         
         [HttpGet("GetAllRoundIdsByQuiz/{quizId}")]
+        [Authorize]
         public async Task<IActionResult> GetAllRoundIdsByQuiz([FromRoute] long quizId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
             if (quiz == null)
             {
@@ -92,6 +104,7 @@ namespace ToX.Controllers
             return Ok(roundIds);
         }
 
+        // ToDo: remove helper method
         [HttpGet("GetAllAnswers")]
         public async Task<IActionResult> GetAllAnswers()
         {
@@ -100,11 +113,17 @@ namespace ToX.Controllers
         }
 
         [HttpPost("CreateQuiz")]
+        [Authorize]
         public async Task<IActionResult> CreateQuiz([FromBody] QuizDto quizDto)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid quiz object");
             }
 
             Quiz quiz = await _quizService.CreateQuiz(quizDto);
@@ -113,8 +132,15 @@ namespace ToX.Controllers
         }
         
         [HttpPut("PushRound/{roundId}")]
+        [Authorize]
         public async Task<IActionResult> PushRound([FromRoute] long roundId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
             Round? round = await _roundService.GetRoundOrNull(roundId);
             if (round == null)
             {
@@ -133,11 +159,18 @@ namespace ToX.Controllers
         }
 
         [HttpPost("CreateRound")]
+        [Authorize]
         public async Task<IActionResult> CreateRound(RoundDto roundDto)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid round");
+                return BadRequest("Invalid round object");
             }
 
             Round round = await _roundService.CreateRound(roundDto);
@@ -145,10 +178,15 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(CreateRound), returnRoundDto);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost("CreateAnswer")]
         public async Task<IActionResult> CreateAnswer(AnswerDto answerDto)
         {
+            Player? claimPlayer = await _playerService.VerifyPlayer(HttpContext.User);
+            if (claimPlayer == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest("Invalid answer");
@@ -178,8 +216,25 @@ namespace ToX.Controllers
         }
 
         [HttpGet("WaitResult/{quizId}/{roundId}")]
+        [Authorize]
         public async Task<ActionResult<WaitResultDto>> GetWaitResult([FromRoute] long quizId, [FromRoute] long roundId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            Round? round = await _roundService.GetRoundOrNull(roundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
             List<Answer> answered = await _answerService.GetAnswersByRoundId(roundId);
             List<Player> all = await _playerService.GetPlayersByQuiz(quizId);
             
@@ -194,9 +249,15 @@ namespace ToX.Controllers
             return Ok(waitResultDto);
         }
         
+        [Authorize]
         [HttpGet("IntermediateResult/{quizId}/{roundId}")]
         public async Task<ActionResult<WaitResultDto>> GetIntermediateResult([FromRoute] long quizId, [FromRoute] long roundId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             Round? round = await _roundService.GetRoundOrNull(roundId);
             if (round == null)
             {
@@ -216,19 +277,36 @@ namespace ToX.Controllers
             return Ok(intermediateResultDtos);
         }
         
-        
+        [Authorize]
         [HttpGet("GetPlayers/{quizId}")]
         public async Task<ActionResult<string>> GetPlayersByQuiz([FromRoute] long quizId)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
             List<Player> playerList = await _playerService.GetPlayersByQuiz(quizId);
             List<string> playerNames = playerList.Select(p => p.PlayerName).ToList();
             string message = string.Join(" ", playerNames);
             return Ok(new {message});
         }
 
+        // ToDo: remove helper method
         [HttpGet("GetQuiz/{id}")]
         public async Task<IActionResult> GetAllQuiz([FromRoute] long id)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
             Quiz? quiz = await _quizService.GetQuizOrNull(id);
             if (quiz == null)
             {
@@ -239,10 +317,15 @@ namespace ToX.Controllers
             return Ok(new { quizDto });
         }
 
-
+        [Authorize]
         [HttpGet("GetRound/{id}")]
         public async Task<IActionResult> GetRound([FromRoute] long id)
         {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
             Round? round = await _roundService.GetRoundOrNull(id);
             if (round == null)
             {
@@ -253,6 +336,7 @@ namespace ToX.Controllers
             return Ok(roundDto);
         }
 
+        // ToDo: remove helper method
         [HttpGet("GetAnswer/{id}")]
         public async Task<IActionResult> GetAnswer([FromRoute] long id)
         {
@@ -266,8 +350,8 @@ namespace ToX.Controllers
             return Ok(new { answerDto });
         }
         
+        // ToDo: remove helper method
         [HttpGet("GetAnswerByQuestion/{questionId}")]
-        [Authorize]
         public async Task<IActionResult> GetAnswerByRoundId([FromRoute] long questionId)
         {
             List<Answer> answers = await _answerService.GetAnswersByRoundId(questionId);

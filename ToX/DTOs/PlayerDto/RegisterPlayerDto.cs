@@ -18,6 +18,13 @@ public class RegisterPlayerDto
     public RegisterPlayerDto(Player player)
     {
         PlayerName = player.PlayerName;
+        QuizId = player.QuizId;
+    }
+    
+    public RegisterPlayerDto(string playerName, long quizId)
+    {
+        PlayerName = playerName;
+        QuizId = quizId;
     }
 
     public Player toEntity()
