@@ -349,14 +349,14 @@ namespace ToX.Controllers
                 }
             }
             
-            List<Round> rounds = await _roundService.GetAllRounds();
-            foreach (Round round in rounds)
-            {
-                if (_answerService.GetAnswersByRoundId(round.Id).Result.Count == 0)
-                {
-                    _roundService.Delete(round);
-                }
-            }
+            // List<Round> rounds = await _roundService.GetAllRounds();
+            // foreach (Round round in rounds)
+            // {
+            //     if (_answerService.GetAnswersByRoundId(round.Id).Result.Count == 0)
+            //     {
+            //         _roundService.Delete(round);
+            //     }
+            // }
             
             List<Quiz> quizzes = await _quizService.GetAllQuizzes();
             foreach (Quiz quiz in quizzes)
