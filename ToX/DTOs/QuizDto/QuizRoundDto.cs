@@ -13,6 +13,9 @@ public class QuizRoundDto
   public string Title { get; set; }
   
   [Required]
+  public long Id { get; set; }
+  
+  [Required]
   public List<RoundDto.RoundDto> Rounds { get; set; }
     
   [JsonConstructor]
@@ -22,6 +25,7 @@ public class QuizRoundDto
   {
     HostId = quiz.HostId;
     Title = quiz.Title;
+    Id = quiz.Id;
     Rounds = new List<RoundDto.RoundDto>();
   }
 }
