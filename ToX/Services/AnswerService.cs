@@ -41,6 +41,11 @@ public class AnswerService
     return await _answerRepository.GetAnswerById(id);
   }
   
+  public void Delete(Answer answer)
+  {
+    _answerRepository.DeleteAnswer(answer);
+  }
+  
   public async Task<bool> AnswerExists(string playerName, long roundId)
   {
     return await _answerRepository.AnswerExistsByPlayerRound(playerName, roundId);
@@ -49,5 +54,10 @@ public class AnswerService
   public async Task<List<Answer>> GetAnswersByRoundId(long id)
   {
     return await _answerRepository.GetAnswerByRoundId(id);
+  }
+  
+  public async Task<List<Answer>> GetAnswersByPlayer(Player player)
+  {
+    return await _answerRepository.GetAnswerByPlayer(player);
   }
 }

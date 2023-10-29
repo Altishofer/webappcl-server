@@ -20,6 +20,11 @@ public class PlayerRepository
         return _context.Player.ToList();
     }
     
+    public void DeletePlayer(Player player)
+    {
+        _context.Remove(player);
+    }
+    
     public async Task<Player?> GetPlayer(string playerName, long quizId)
     {
         return await _context.Player.FirstOrDefaultAsync(h => h.PlayerName == playerName && h.QuizId == quizId);

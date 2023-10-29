@@ -22,6 +22,11 @@ public class AnswerRepository
         return await _context.Answer.FindAsync(answerId);
     }
     
+    public void DeleteAnswer(Answer answer)
+    {
+        _context.Remove(answer);
+    }
+    
     public async Task<bool> AnswerExistsByPlayerRound(string playerName, long roundId)
     {
         return await _context.Answer.FirstOrDefaultAsync(h => h.PlayerName == playerName && h.RoundId == roundId) != null;
@@ -47,6 +52,11 @@ public class AnswerRepository
     public async Task<List<Answer>> GetAnswerByRoundId(long roundId)
     {
         return _context.Answer.Where(a => a.RoundId == roundId).ToList();
+    }
+    
+    public async Task<List<Answer>> GetAnswerByPlayer(Player player)
+    {
+        return _context.Answer.Where(a => a.PlayerName == player.PlayerName && a.QuizId == player.QuizId).ToList();
     }
     
     public async Task<Answer?> GetAnswerByRoundIdPlayerId(long roundId, string playerName)

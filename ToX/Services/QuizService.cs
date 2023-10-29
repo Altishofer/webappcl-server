@@ -20,7 +20,7 @@ public class QuizService
         return await _quizRepository.GetAllQuizzes();
     }
     
-    public async Task<List<Quiz>> GetAllQuizzesByUser(Models.Host host)
+    public async Task<List<Quiz>> GetAllQuizzesByHost(Models.Host host)
     {
         return await _quizRepository.GetQuizzesByHostId(host.hostId);
     }
@@ -30,6 +30,11 @@ public class QuizService
         Quiz quiz = quizDto.toQuiz();
         quiz.Id = await _quizRepository.NextQuizId();
         return await _quizRepository.SaveQuiz(quiz);
+    }
+
+    public void Delete(Quiz quiz)
+    {
+        _quizRepository.DeleteQuiz(quiz);
     }
     
     public async Task<Quiz?> GetQuizOrNull(long id)

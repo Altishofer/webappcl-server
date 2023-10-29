@@ -16,6 +16,11 @@ public class HostRepository
     {
         _context = context;
     }
+    
+    public void DeleteHost(Host host)
+    {
+        _context.Remove(host);
+    }
 
     public async Task<List<Host>> GetAllHosts()
     {

@@ -11,6 +11,11 @@ public class RoundRepository
     {
         _context = context;
     }
+    
+    public void DeleteRound(Round round)
+    {
+        _context.Remove(round);
+    }
 
     public async Task<List<Round>> GetAllRounds()
     {

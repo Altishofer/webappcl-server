@@ -83,6 +83,11 @@ public class PlayerService
         return jwt;
     }
     
+    public void Delete(Player player)
+    {
+        _playerRepository.DeletePlayer(player);
+    }
+    
     public async Task<Player?> VerifyPlayer(ClaimsPrincipal context)
     {
         string? playerNameClaim;

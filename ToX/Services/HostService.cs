@@ -77,6 +77,11 @@ public class HostService
         return await GenerateToken(new RegisterHostDTO(host.hostName, host.hostPassword));
     }
     
+    public void Delete(Host host)
+    {
+        _hostRepository.DeleteHost(host);
+    }
+    
     public async Task<string> GenerateToken(RegisterHostDTO registerHostDto)
     {
         JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();

@@ -59,7 +59,7 @@ namespace ToX.Controllers
                 return Unauthorized("The token could not be validated");
             }
 
-            List<Quiz> quizzes = await _quizService.GetAllQuizzesByUser(claimHost);
+            List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(claimHost);
             return Ok(quizzes);
         }
 
@@ -334,6 +334,58 @@ namespace ToX.Controllers
 
             RoundDto roundDto = new RoundDto(round);
             return Ok(roundDto);
+        }
+        
+        // ToDo: remove helper method
+        [HttpPut("CleanUp")]
+        public async Task<IActionResult> CleanUp()
+        {
+            List<Answer> answers = await _answerService.GetAllAnswers();
+            foreach (Answer answer in answers)
+            {
+                if (answer.Additions.Count == 0 && answer.Subtractions.Count == 0)
+                {
+                    _answerService.Delete(answer);
+                }
+            }
+            
+            List<Round> rounds = await _roundService.GetAllRounds();
+            foreach (Round round in rounds)
+            {
+                if (_answerService.GetAnswersByRoundId(round.Id).Result.Count == 0)
+                {
+                    _roundService.Delete(round);
+                }
+            }
+            
+            List<Quiz> quizzes = await _quizService.GetAllQuizzes();
+            foreach (Quiz quiz in quizzes)
+            {
+                if (_roundService.GetAllRoundsByQuiz(quiz).Result.Count == 0)
+                {
+                    _quizService.Delete(quiz);
+                }
+            }
+            
+            List<Player> players = await _playerService.GetAllPlayers();
+            foreach (Player player in players)
+            {
+                if (_answerService.GetAnswersByPlayer(player).Result.Count == 0)
+                {
+                    _playerService.Delete(player);
+                }
+            }
+            
+            List<Host> hosts = await _hostService.GetAllHosts();
+            foreach (Host host in hosts)
+            {
+                if (_quizService.GetAllQuizzesByHost(host).Result.Count == 0)
+                {
+                    _hostService.Delete(host);
+                }
+            }
+            _context.SaveChanges();
+            return Ok();
         }
 
         // ToDo: remove helper method

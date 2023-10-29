@@ -11,6 +11,11 @@ public class QuizRepository
     {
         _context = context;
     }
+    
+    public void DeleteQuiz(Quiz quiz)
+    {
+        _context.Remove(quiz);
+    }
 
     public async Task<List<Quiz>> GetAllQuizzes()
     {

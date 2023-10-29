@@ -32,6 +32,11 @@ public class RoundService
     return await _roundRepository.GetRoundsByQuizId(id);
   }
   
+  public void Delete(Round round)
+  {
+    _roundRepository.DeleteRound(round);
+  }
+  
   public async Task<Round> CreateRound(RoundDto roundDto)
   {
     Round round = roundDto.toRound();
