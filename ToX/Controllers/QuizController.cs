@@ -316,6 +316,27 @@ namespace ToX.Controllers
             QuizDto quizDto = new QuizDto(quiz);
             return Ok(new { quizDto });
         }
+        
+        [Authorize]
+        [HttpGet("GetQuizzesWithRounds")]
+        public async Task<IActionResult> GetAllQuiz()
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
+            List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(claimHost);
+            List<QuizRoundDto> quizDtos = quizzes.Select(q => 
+            {
+                var quizRoundDto = new QuizRoundDto(q);
+                quizRoundDto.Rounds = _roundService.GetAllRoundsByQuiz(q).Result.Select(r => new RoundDto(r)).ToList();
+                return quizRoundDto;
+            }).ToList();
+
+            return Ok(quizDtos);
+        }
 
         [Authorize]
         [HttpGet("GetRound/{id}")]

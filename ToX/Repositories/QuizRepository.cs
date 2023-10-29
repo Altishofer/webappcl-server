@@ -24,7 +24,7 @@ public class QuizRepository
     
     public async Task<List<Quiz>> GetQuizzesByHostId(long id)
     {
-        return _context.Quiz.Where(h => h.Id == id).ToList();
+        return _context.Quiz.Where(h => h.HostId == id).ToList();
     }
     
     public async Task<Quiz?> GetQuizById(long quizId)
