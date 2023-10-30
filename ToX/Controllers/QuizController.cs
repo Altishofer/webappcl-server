@@ -364,6 +364,36 @@ namespace ToX.Controllers
             RoundDto roundDto = new RoundDto(round);
             return Ok(roundDto);
         }
+
+        //Todo: Activate authorization
+        //[Authorize]
+        [HttpPut("ChangeRound")]
+        public async Task<IActionResult> ChangeRound(RoundDto roundDto)
+        {
+            /*
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            */
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid round object");
+            }
+            
+            Round? foundRound = await _roundService.GetRoundOrNull(roundDto.Id);
+            if (foundRound == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Round round = await _roundService.ChangeRound(roundDto, foundRound);
+            RoundDto returnRoundDto = new RoundDto(round);
+            
+            return CreatedAtAction(nameof(ChangeRound), returnRoundDto);
+        }
         
         // ToDo: remove helper method
         [HttpPut("CleanUp")]

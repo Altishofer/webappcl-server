@@ -48,4 +48,13 @@ public class RoundRepository
         await _context.SaveChangesAsync();
         return round;
     }
+
+    public async Task<Round> ChangeExistingRound(Round round)
+    {
+        Round foundRound = await this.GetRoundById(round.Id);
+        _context.Entry(foundRound).CurrentValues.SetValues(round.Id);
+        _context.Entry(foundRound).Property(x => x.Id).IsModified = false;
+        await _context.SaveChangesAsync();
+        return round;
+    }
 }

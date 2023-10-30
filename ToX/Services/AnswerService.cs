@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ToX.DTOs;
+using ToX.DTOs.RoundDto;
 using ToX.Models;
 using ToX.Repositories;
 using Word2vec.Tools;
