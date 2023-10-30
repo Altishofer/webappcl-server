@@ -131,8 +131,8 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto });
         }
         
-        [HttpPut("PushRound/{roundId}")]
         [Authorize]
+        [HttpPost("PushRound/{roundId}")]
         public async Task<IActionResult> PushRound([FromRoute] long roundId)
         {
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
