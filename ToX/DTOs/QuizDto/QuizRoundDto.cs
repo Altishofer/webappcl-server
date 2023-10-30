@@ -13,7 +13,7 @@ public class QuizRoundDto
   public string Title { get; set; }
   
   [Required]
-  public long Id { get; set; }
+  public long QuizId { get; set; }
   
   [Required]
   public List<RoundDto.RoundDto> Rounds { get; set; }
@@ -25,7 +25,7 @@ public class QuizRoundDto
   {
     HostId = quiz.HostId;
     Title = quiz.Title;
-    Id = quiz.Id;
+    QuizId = quiz.Id;
     Rounds = new List<RoundDto.RoundDto>();
   }
 }

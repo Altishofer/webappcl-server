@@ -15,6 +15,7 @@ public class RoundRepository
     public void DeleteRound(Round round)
     {
         _context.Remove(round);
+        _context.SaveChanges();
     }
 
     public async Task<List<Round>> GetAllRounds()

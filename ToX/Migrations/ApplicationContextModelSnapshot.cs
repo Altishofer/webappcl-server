@@ -24,12 +24,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.Answer", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("QuizId"));
 
                     b.Property<List<string>>("Additions")
                         .IsRequired()
@@ -67,9 +67,9 @@ namespace ToX.Migrations
                         .HasColumnType("text[]")
                         .HasColumnName("subtractions");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("QuizId")
                         .IsUnique();
 
                     b.ToTable("answer");
@@ -104,12 +104,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.Player", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("QuizId"));
 
                     b.Property<string>("PlayerName")
                         .IsRequired()
@@ -120,9 +120,9 @@ namespace ToX.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("quizid");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("QuizId")
                         .IsUnique();
 
                     b.ToTable("player");
@@ -130,12 +130,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.Quiz", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("QuizId"));
 
                     b.Property<long>("HostId")
                         .HasColumnType("bigint")
@@ -146,9 +146,9 @@ namespace ToX.Migrations
                         .HasColumnType("text")
                         .HasColumnName("title");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("QuizId")
                         .IsUnique();
 
                     b.ToTable("quiz");
@@ -156,12 +156,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.Round", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("QuizId"));
 
                     b.Property<List<string>>("ForbiddenWords")
                         .IsRequired()
@@ -182,9 +182,9 @@ namespace ToX.Migrations
                         .HasColumnType("real[]")
                         .HasColumnName("roundtargetvector");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("QuizId")
                         .IsUnique();
 
                     b.ToTable("round");
@@ -192,12 +192,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.TodoItem", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("QuizId"));
 
                     b.Property<bool>("IsComplete")
                         .HasColumnType("boolean")
@@ -207,9 +207,9 @@ namespace ToX.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("QuizId")
                         .IsUnique();
 
                     b.ToTable("todoitems");
@@ -217,12 +217,12 @@ namespace ToX.Migrations
 
             modelBuilder.Entity("ToX.Models.WordVector", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("QuizId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuizId"));
 
                     b.Property<double>("MetricLength")
                         .HasColumnType("double precision")
@@ -238,7 +238,7 @@ namespace ToX.Migrations
                         .HasColumnType("text")
                         .HasColumnName("wordornull");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
                     b.HasIndex("WordOrNull")
                         .IsUnique();

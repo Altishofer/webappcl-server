@@ -67,7 +67,7 @@ namespace ToX.Controllers
         [HttpGet("GetAllRounds")]
         public async Task<IActionResult> GetAllRounds()
         {
-            List<Round> rounds = await _roundService.GetAllRounds();
+            List<RoundDto> rounds = _roundService.GetAllRounds().Result.Select(r => new RoundDto(r)).ToList();
             return Ok(rounds);
         }
         
@@ -80,7 +80,7 @@ namespace ToX.Controllers
             {
                 return Unauthorized("The token could not be validated");
             }
-            List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
+            List<RoundDto> rounds = _roundService.GetAllRoundsByQuiz(quizId).Result.Select(r => new RoundDto(r)).ToList();
             return Ok(rounds);
         }
         
@@ -334,16 +334,20 @@ namespace ToX.Controllers
             {
                 return Unauthorized("The token could not be validated");
             }
-            
-            List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(claimHost);
-            List<QuizRoundDto> quizDtos = quizzes.Select(q => 
+
+            List<QuizRoundDto> quizRoundDto = await GetQuizRoundDtos(claimHost);
+            return Ok(quizRoundDto);
+        }
+
+        private async Task<List<QuizRoundDto>> GetQuizRoundDtos(Host host)
+        {
+            List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(host);
+            return quizzes.Select(q => 
             {
                 var quizRoundDto = new QuizRoundDto(q);
                 quizRoundDto.Rounds = _roundService.GetAllRoundsByQuiz(q).Result.Select(r => new RoundDto(r)).ToList();
                 return quizRoundDto;
             }).ToList();
-
-            return Ok(quizDtos);
         }
 
         [Authorize]
@@ -366,17 +370,16 @@ namespace ToX.Controllers
         }
 
         //Todo: Activate authorization
-        //[Authorize]
-        [HttpPut("ChangeRound")]
+        [Authorize]
+        [HttpPut("UpdateRound")]
         public async Task<IActionResult> ChangeRound(RoundDto roundDto)
         {
-            /*
+            
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
             {
                 return Unauthorized("The token could not be validated");
             }
-            */
             
             if (!ModelState.IsValid)
             {
@@ -395,6 +398,52 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(ChangeRound), returnRoundDto);
         }
         
+        //Todo: Activate authorization
+        [Authorize]
+        [HttpPut("UpdateQuiz")]
+        public async Task<IActionResult> ChangeQuiz(QuizRoundDto quizRoundDto)
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid object");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizRoundDto.QuizId);
+            if (quiz == null)
+            {
+                return NotFound("quiz not found");
+            }
+
+            List<long> currentRoundIds = _roundService.GetAllRoundsByQuiz(quizRoundDto.QuizId).Result.Select(r => r.Id).ToList();
+            List<long> roundIds = quizRoundDto.Rounds.Select(r => r.Id).ToList();
+            List<long> roundsToRemove = currentRoundIds.Except(roundIds).ToList();
+            foreach (long roundId in roundsToRemove)
+            {
+                _roundService.Delete(roundId);
+            }
+
+            foreach (RoundDto roundDto in quizRoundDto.Rounds)
+            {
+                Round? round = await _roundService.GetRoundOrNull(roundDto.Id);
+                if (round == null)
+                {
+                    await _roundService.CreateRound(roundDto);
+                    continue;
+                } 
+                await _roundService.ChangeRound(roundDto, round);
+            }
+            
+            List<QuizRoundDto> quizRoundDtoNew = await GetQuizRoundDtos(claimHost);
+            return CreatedAtAction(nameof(ChangeQuiz), quizRoundDtoNew);
+        }
+
+        
         // ToDo: remove helper method
         [HttpPut("CleanUp")]
         public async Task<IActionResult> CleanUp()
@@ -411,7 +460,7 @@ namespace ToX.Controllers
             // List<Round> rounds = await _roundService.GetAllRounds();
             // foreach (Round round in rounds)
             // {
-            //     if (_answerService.GetAnswersByRoundId(round.Id).Result.Count == 0)
+            //     if (_answerService.GetAnswersByRoundId(round.QuizId).Result.Count == 0)
             //     {
             //         _roundService.Delete(round);
             //     }

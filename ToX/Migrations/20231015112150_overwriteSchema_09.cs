@@ -11,7 +11,7 @@ namespace ToX.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "Id",
+                name: "QuizId",
                 table: "player",
                 newName: "id");
 
@@ -27,7 +27,7 @@ namespace ToX.Migrations
             migrationBuilder.RenameColumn(
                 name: "id",
                 table: "player",
-                newName: "Id");
+                newName: "QuizId");
 
             migrationBuilder.RenameIndex(
                 name: "IX_player_id",

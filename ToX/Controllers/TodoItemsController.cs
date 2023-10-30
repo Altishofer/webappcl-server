@@ -104,7 +104,7 @@ namespace ToX.Controllers
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
+            //    return CreatedAtAction("GetTodoItem", new { id = todoItem.QuizId }, todoItem);
             return CreatedAtAction(nameof(PostTodoItem), new { id = todoItem.Id }, todoItem);
         }
 

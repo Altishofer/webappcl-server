@@ -37,6 +37,15 @@ public class RoundService
     _roundRepository.DeleteRound(round);
   }
   
+  public async void Delete(long id)
+  {
+    Round? round = await _roundRepository.GetRoundById(id);
+    if (round != null)
+    {
+      _roundRepository.DeleteRound(round);
+    }
+  }
+  
   public async Task<Round> CreateRound(RoundDto roundDto)
   {
     Round round = roundDto.toRound();

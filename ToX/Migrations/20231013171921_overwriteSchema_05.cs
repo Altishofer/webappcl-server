@@ -31,7 +31,7 @@ namespace ToX.Migrations
                 newName: "metriclength");
 
             migrationBuilder.RenameColumn(
-                name: "Id",
+                name: "QuizId",
                 table: "wordvector",
                 newName: "id");
 
@@ -46,7 +46,7 @@ namespace ToX.Migrations
                 newName: "iscomplete");
 
             migrationBuilder.RenameColumn(
-                name: "Id",
+                name: "QuizId",
                 table: "todoitems",
                 newName: "id");
 
@@ -152,7 +152,7 @@ namespace ToX.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_player_Id",
                 table: "player",
-                column: "Id",
+                column: "QuizId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -214,7 +214,7 @@ namespace ToX.Migrations
             migrationBuilder.RenameColumn(
                 name: "id",
                 table: "wordvector",
-                newName: "Id");
+                newName: "QuizId");
 
             migrationBuilder.RenameColumn(
                 name: "name",
@@ -229,7 +229,7 @@ namespace ToX.Migrations
             migrationBuilder.RenameColumn(
                 name: "id",
                 table: "todoitems",
-                newName: "Id");
+                newName: "QuizId");
 
             migrationBuilder.RenameColumn(
                 name: "hostpassword",
