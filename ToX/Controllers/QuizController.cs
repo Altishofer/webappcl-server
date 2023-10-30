@@ -211,7 +211,10 @@ namespace ToX.Controllers
             
             Answer answer = await _answerService.CreateAnswer(answerDto, round.RoundTargetVector);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
-            await GetWaitResult(answerDto.QuizId, answerDto.RoundId);
+            
+            WaitResultDto waitResultDto = await GetWaitResultDto(answerDto.QuizId, answerDto.RoundId);
+            await _quizHub.SendWaitRankingToGroup(answerDto.QuizId.ToString(), waitResultDto);
+            
             return CreatedAtAction(nameof(CreateAnswer), returnAnswerDto);
         }
 
@@ -235,6 +238,14 @@ namespace ToX.Controllers
             {
                 return BadRequest("Quiz does not exist");
             }
+
+            WaitResultDto waitResultDto = await GetWaitResultDto(quizId, roundId);
+            await _quizHub.SendWaitRankingToGroup(quizId.ToString(), waitResultDto);
+            return Ok(waitResultDto);
+        }
+
+        private async Task<WaitResultDto> GetWaitResultDto(long quizId, long roundId)
+        {
             List<Answer> answered = await _answerService.GetAnswersByRoundId(roundId);
             List<Player> all = await _playerService.GetPlayersByQuiz(quizId);
             
@@ -242,11 +253,8 @@ namespace ToX.Controllers
             List<string> allPlayers = all.Select(p => p.PlayerName).ToList();
             
             List<string> notAnsweredPlayers = allPlayers.Except(answeredPlayers).ToList();
-            Console.WriteLine(notAnsweredPlayers);
-            WaitResultDto waitResultDto = new WaitResultDto(notAnsweredPlayers, answeredPlayers);
-            
-            await _quizHub.SendWaitRankingToGroup(quizId.ToString(), waitResultDto);
-            return Ok(waitResultDto);
+
+            return new WaitResultDto(notAnsweredPlayers, answeredPlayers);
         }
         
         [Authorize]
