@@ -15,7 +15,7 @@ public class RoundDto
   
   [Required]
   public string RoundTarget { get; set; }
-  
+  [Required]
   public List<string> ForbiddenWords { get; set; }
     
   [JsonConstructor]

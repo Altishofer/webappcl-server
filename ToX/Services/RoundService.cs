@@ -49,18 +49,13 @@ public class RoundService
   {
     return await _roundRepository.GetRoundById(id);
   }
-
+  
   public async Task<Round> ChangeRound(RoundDto roundDto, Round foundRound)
   {
-    Round round = roundDto.toRound();
-
-    if (foundRound.RoundTarget == round.RoundTarget) {
-      round.RoundTargetVector = foundRound.RoundTargetVector;
-    }
-    else {
-      round.RoundTargetVector = await _word2VectorService.FindClosestVectorAsync(round.RoundTarget);
-    }
-    
-    return await _roundRepository.ChangeExistingRound(round);
+    foundRound.RoundTarget = roundDto.RoundTarget;
+    foundRound.RoundTargetVector = await _word2VectorService.FindClosestVectorAsync(roundDto.RoundTarget);
+    foundRound.ForbiddenWords = roundDto.ForbiddenWords;
+    _roundRepository.Update(foundRound);
+    return foundRound;
   }
 }
