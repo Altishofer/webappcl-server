@@ -131,7 +131,7 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(CreateQuiz), new { returnQuizDto });
         }
         
-        [HttpPut("PushRound/{roundId}")]
+        [HttpGet("PushRound/{roundId}")]
         [Authorize]
         public async Task<IActionResult> PushRound([FromRoute] long roundId)
         {
