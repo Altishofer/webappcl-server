@@ -32,6 +32,7 @@ public class RoundDto
   public Round toRound()
   {
     Round round = new Round();
+    round.Id = Id;
     round.QuizId = QuizId;
     round.ForbiddenWords = ForbiddenWords;
     round.RoundTarget = RoundTarget;

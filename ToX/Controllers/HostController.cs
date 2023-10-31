@@ -46,8 +46,8 @@ namespace ToX.Controllers
                 return BadRequest("Hostname is already taken, please choose another one");
             }
 
-            await _hostService.CreateHost(hostDTO);
-            return CreatedAtAction(nameof(Register), _hostService.GenerateToken(hostDTO));
+            Host host = await _hostService.CreateHost(hostDTO);
+            return CreatedAtAction(nameof(Register), new {token = _hostService.GenerateToken(hostDTO), id = host.hostId }); 
         }
         
         // POST: api/Host/Login
@@ -66,7 +66,7 @@ namespace ToX.Controllers
                 return Unauthorized("User with given credentials was not found");
             }
             
-            return Ok(_hostService.GenerateToken(hostDto));
+            return Ok(new {token = _hostService.GenerateToken(hostDto), id = authHost.hostId});
         }
         
         // POST: api/Host/RefreshToken

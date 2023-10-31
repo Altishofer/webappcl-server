@@ -24,6 +24,13 @@ public class QuizDto
         HostId = quiz.HostId;
         Title = quiz.Title;
     }
+    
+    public QuizDto(long id, long hostId, string title)
+    {
+        Id = id;
+        HostId = hostId;
+        Title = title;
+    }
 
     public Quiz toQuiz()
     {
