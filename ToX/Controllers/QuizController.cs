@@ -60,6 +60,7 @@ namespace ToX.Controllers
             }
 
             List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(claimHost);
+            quizzes.Sort((a, b) => a.Id < b.Id ? -1 : 1);
             return Ok(quizzes);
         }
 
@@ -81,6 +82,7 @@ namespace ToX.Controllers
                 return Unauthorized("The token could not be validated");
             }
             List<RoundDto> rounds = _roundService.GetAllRoundsByQuiz(quizId).Result.Select(r => new RoundDto(r)).ToList();
+            rounds.Sort((a, b) => a.Id < b.Id ? -1 : 1);
             return Ok(rounds);
         }
         
@@ -101,6 +103,7 @@ namespace ToX.Controllers
             
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             List<long> roundIds = rounds.Select(r => r.Id).ToList();
+            roundIds.Sort((a, b) => a < b ? -1 : 1);
             return Ok(roundIds);
         }
 
@@ -315,6 +318,48 @@ namespace ToX.Controllers
         }
         
         [Authorize]
+        [HttpGet("FinalResult/{quizId}")]
+        public async Task<ActionResult<WaitResultDto>> GetFinalResult([FromRoute] long quizId)
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+            
+            List<FinalResultDto> finalResultDtos = new List<FinalResultDto>();
+            List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
+            List<Answer> answers = new List<Answer>();
+            foreach (Round round in rounds)
+            {
+                List<Answer> roundAnswers = await _answerService.GetAnswersByRoundId(round.Id);
+                answers.AddRange(roundAnswers);
+            }
+            
+            foreach (Answer answer in answers)
+            {
+                if (finalResultDtos.Exists(r => answer.PlayerName == r.PlayerName))
+                {
+                    finalResultDtos.Find(r => r.PlayerName == answer.PlayerName).Points += answer.Points;
+                }
+                else
+                {
+                    finalResultDtos.Add(new FinalResultDto(answer.PlayerName, answer.Points));
+                }
+            }
+            
+            finalResultDtos.Sort((a, b) => a.Points > b.Points ? -1 : 1);
+            _quizHub.SendFinalResultToGroup(quizId.ToString(), finalResultDtos);
+            return Ok(finalResultDtos);
+        }
+        
+        [Authorize]
         [HttpGet("GetPlayers/{quizId}")]
         public async Task<ActionResult<string>> GetPlayersByQuiz([FromRoute] long quizId)
         {
@@ -365,18 +410,22 @@ namespace ToX.Controllers
             }
 
             List<QuizRoundDto> quizRoundDto = await GetQuizRoundDtos(claimHost);
+            quizRoundDto.Sort((a, b) => a.QuizId < b.QuizId ? -1 : 1);
             return Ok(quizRoundDto);
         }
 
         private async Task<List<QuizRoundDto>> GetQuizRoundDtos(Host host)
         {
             List<Quiz> quizzes = await _quizService.GetAllQuizzesByHost(host);
-            return quizzes.Select(q => 
+            List<QuizRoundDto> result =  quizzes.Select(q => 
             {
                 var quizRoundDto = new QuizRoundDto(q);
                 quizRoundDto.Rounds = _roundService.GetAllRoundsByQuiz(q).Result.Select(r => new RoundDto(r)).ToList();
+                quizRoundDto.Rounds.Sort((a, b) => a.Id < b.Id ? -1 : 1);
                 return quizRoundDto;
             }).ToList();
+            result.Sort((a, b) => a.QuizId < b.QuizId ? -1 : 1);
+            return result;
         }
         
         private async Task<QuizRoundDto> GetQuizRoundDto(long quizId)
