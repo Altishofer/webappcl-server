@@ -47,6 +47,11 @@ public class AnswerService
     _answerRepository.DeleteAnswer(answer);
   }
   
+  public async Task<int> DeleteAnswerByQuiz(Quiz quiz)
+  {
+    return await _answerRepository.DeleteAnswersByQuiz(quiz);
+  }
+  
   public async Task<bool> AnswerExists(string playerName, long roundId)
   {
     return await _answerRepository.AnswerExistsByPlayerRound(playerName, roundId);

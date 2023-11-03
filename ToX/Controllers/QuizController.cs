@@ -100,7 +100,9 @@ namespace ToX.Controllers
             {
                 return BadRequest("Quiz does not exist");
             }
-            
+
+            await _answerService.DeleteAnswerByQuiz(quiz);
+            await _playerService.DeletePlayerByQuiz(quiz);
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             List<long> roundIds = rounds.Select(r => r.Id).ToList();
             roundIds.Sort((a, b) => a < b ? -1 : 1);

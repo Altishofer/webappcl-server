@@ -20,6 +20,16 @@ public class PlayerRepository
         return _context.Player.ToList();
     }
     
+    public async Task<int> DeletePlayersByQuiz(Quiz quiz)
+    {
+        List<Player> players = _context.Player.Where(a => a.QuizId == quiz.Id).ToList();
+        foreach (Player player in players)
+        {
+            _context.Remove(player);
+        }
+        return _context.SaveChanges();
+    }
+    
     public void DeletePlayer(Player player)
     {
         _context.Remove(player);

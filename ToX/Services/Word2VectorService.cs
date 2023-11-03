@@ -50,6 +50,10 @@ public class Word2VectorService
     public async Task<double> FindDistance(string word, Representation vector)
     {
         Representation vectorB = await _getWordOrNullVector(word);
+        if (vectorB.WordOrNull == "null")
+        {
+            return -1;
+        }
         return vectorB.GetCosineDistanceTo(vector).DistanceValue;
     }
     

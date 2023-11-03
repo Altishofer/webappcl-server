@@ -49,6 +49,11 @@ public class PlayerService
         return await _playerRepository.GetAllPlayers();
     }
     
+    public async Task<int> DeletePlayerByQuiz(Quiz quiz)
+    {
+        return await _playerRepository.DeletePlayersByQuiz(quiz);
+    }
+    
     public async Task<List<Player>> GetPlayersByQuiz(long quizId)
     {
         return await _playerRepository.GetPlayersByQuiz(quizId);

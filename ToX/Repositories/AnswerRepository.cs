@@ -32,6 +32,16 @@ public class AnswerRepository
         return await _context.Answer.FirstOrDefaultAsync(h => h.PlayerName == playerName && h.RoundId == roundId) != null;
     }
     
+    public async Task<int> DeleteAnswersByQuiz(Quiz quiz)
+    {
+        List<Answer> answers = _context.Answer.Where(a => a.QuizId == quiz.Id).ToList();
+        foreach (Answer answer in answers)
+        {
+            _context.Remove(answer);
+        }
+        return _context.SaveChanges();
+    }
+    
     public async Task<bool> AnswerExistsById(long answerId)
     {
         return await _context.Answer.FirstOrDefaultAsync(h => h.Id == answerId) != null;
