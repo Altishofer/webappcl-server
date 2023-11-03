@@ -473,7 +473,7 @@ namespace ToX.Controllers
             foreach (RoundDto roundDto in quizRoundDto.Rounds)
             {
                 Round? round = await _roundService.GetRoundOrNull(roundDto.Id);
-                if (round == null)
+                if (round == null || round.QuizId != quiz.Id)
                 {
                     await _roundService.CreateRound(roundDto);
                     continue;

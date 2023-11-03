@@ -42,6 +42,11 @@ public class Word2VectorService
         return _instance;
     }
     
+    public async Task<bool> IsValidWord(string word)
+    {
+        return _getWordOrNullVector(word).Result.WordOrNull != "null";
+    }
+    
     public async Task<double> FindDistance(string word, Representation vector)
     {
         Representation vectorB = await _getWordOrNullVector(word);
@@ -64,6 +69,10 @@ public class Word2VectorService
     {
         Representation vector = await _getWordOrNullVector(word);
         DistanceTo[] closest = await Task.Run(() => _vocabulary.Distance(word, 1));
+        if (closest.Length == 0)
+        {
+            return vector.NumericVector;
+        }
         return closest[0].Representation.NumericVector;
     }
 
@@ -117,7 +126,7 @@ public class Word2VectorService
         return _vocabulary
             .Distance(resultVector, 3)
             .Select(w => w.Representation.WordOrNull)
-            //.Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
+            .Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
             .ToList();
     }
 
@@ -141,6 +150,7 @@ public class Word2VectorService
             Representation representation = _vocabulary.GetRepresentationOrNullFor(form);
             if (representation != null)
             {
+                Console.WriteLine(representation.WordOrNull);
                 return representation;
             }
         }

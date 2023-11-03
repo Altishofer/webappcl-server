@@ -72,6 +72,14 @@ namespace ToX.Controllers
                 rootPath = _config["VECTOR_BIN"]
             });
         }
+        
+        [HttpGet("validate/{word}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckValidity([FromRoute] string word)
+        {
+            bool isValid = await _word2VectorService.IsValidWord(word);
+            return Ok(isValid);
+        }
 
         [HttpGet("closestWords/{word}/{count}")]
         [AllowAnonymous]
