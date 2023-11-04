@@ -37,6 +37,15 @@ public class AnswerDto
     Subtractions = answer.Subtractions;
     Additions = answer.Additions;
   }
+  
+  public AnswerDto(long quizId, long roundId, string playerName)
+  {
+    QuizId = quizId;
+    RoundId = roundId;
+    PlayerName = playerName;
+    Subtractions = new List<string>();
+    Additions = new List<string>();
+  }
 
   public Answer toAnswer()
   {

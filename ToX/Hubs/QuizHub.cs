@@ -32,6 +32,12 @@ namespace ToX.Hubs
             Console.WriteLine($"SendMessageToGroup  -> {message}");
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage", message);
         }
+        
+        public async Task SendNavigateToGroup(string groupName, string round)
+        {
+            Console.WriteLine($"SendNavigateToGroup  -> {round}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveNavigate", round);
+        }
 
         public async Task SendNextRoundToGroup(string groupName, string round)
         {
@@ -45,16 +51,10 @@ namespace ToX.Hubs
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveWaitResult", resultDto);
         }
         
-        public async Task SendIntermediateResultToGroup(string groupName, List<IntermediateResultDto> resultDto)
+        public async Task SendFullResultToGroup(string groupName, List<FullResultDto> resultDto)
         {
-            Console.WriteLine($"SendIntermediateResultToGroup -> {resultDto}");
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveIntermediateResult", resultDto);
-        }
-        
-        public async Task SendFinalResultToGroup(string groupName, List<FinalResultDto> resultDto)
-        {
-            Console.WriteLine($"SendFinalResultToGroup -> {resultDto}");
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveIntermediateResult", resultDto);
+            Console.WriteLine($"SendFullResultToGroup -> {resultDto}");
+            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveFullResult", resultDto);
         }
 
         public async Task SendPlayersToGroup(string groupName, string playerString)

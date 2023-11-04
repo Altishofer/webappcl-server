@@ -230,17 +230,17 @@ namespace ToX.Controllers
             {
                 return BadRequest("Answer already exists");
             }
-
-            Round? round = await _roundService.GetRoundOrNull(answerDto.RoundId);
-            if (round == null)
-            {
-                return BadRequest("Round does not exist");
-            }
             
             Quiz? quiz = await _quizService.GetQuizOrNull(answerDto.QuizId);
             if (quiz == null)
             {
                 return BadRequest("Quiz does not exist");
+            }
+
+            Round? round = await _roundService.GetRoundOrNull(answerDto.RoundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
             }
             
             Answer answer = await _answerService.CreateAnswer(answerDto, round.RoundTargetVector);
@@ -292,36 +292,8 @@ namespace ToX.Controllers
         }
         
         [Authorize]
-        [HttpGet("IntermediateResult/{quizId}/{roundId}")]
-        public async Task<ActionResult<WaitResultDto>> GetIntermediateResult([FromRoute] long quizId, [FromRoute] long roundId)
-        {
-            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
-            if (claimHost == null)
-            {
-                return Unauthorized("The token could not be validated");
-            }
-            Round? round = await _roundService.GetRoundOrNull(roundId);
-            if (round == null)
-            {
-                return BadRequest("Round does not exist");
-            }
-            
-            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
-            if (quiz == null)
-            {
-                return BadRequest("Quiz does not exist");
-            }
-
-            List<Answer> answers = await _answerService.GetAnswersByRoundId(roundId);
-            List<IntermediateResultDto> intermediateResultDtos = answers.Select(a => new IntermediateResultDto(a)).ToList();
-            intermediateResultDtos.Sort((a, b) => a.Points > b.Points ? -1 : 1);
-            _quizHub.SendIntermediateResultToGroup(quizId.ToString(), intermediateResultDtos);
-            return Ok(intermediateResultDtos);
-        }
-        
-        [Authorize]
-        [HttpGet("FinalResult/{quizId}")]
-        public async Task<ActionResult<WaitResultDto>> GetFinalResult([FromRoute] long quizId)
+        [HttpGet("FullResult/{quizId}")]
+        public async Task<ActionResult<FullResultDto>> GetFullResult([FromRoute] long quizId)
         {
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
@@ -335,31 +307,58 @@ namespace ToX.Controllers
                 return BadRequest("Quiz does not exist");
             }
             
-            List<FinalResultDto> finalResultDtos = new List<FinalResultDto>();
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
-            List<Answer> answers = new List<Answer>();
-            foreach (Round round in rounds)
+            List<Answer> answers = rounds.Select((r => _answerService.GetAnswersByRoundId(r.Id).Result)).SelectMany(a => a).ToList();
+            List<Player> players = await _playerService.GetPlayersByQuiz(quizId);
+            
+            long lastRound = answers.Select(a => answers.Max(a => a.RoundId)).Max();
+            foreach (Round roundTmp in rounds)
             {
-                List<Answer> roundAnswers = await _answerService.GetAnswersByRoundId(round.Id);
-                answers.AddRange(roundAnswers);
+                if (roundTmp.Id <= lastRound)
+                {
+                    foreach (Player player in players)
+                    {
+                        if (!answers.Exists(a => a.PlayerName == player.PlayerName && a.RoundId == roundTmp.Id))
+                        {
+                            AnswerDto answerDto = new AnswerDto(quizId, roundTmp.Id, player.PlayerName);
+                            answers.Add(_answerService.CreateAnswer(answerDto, roundTmp.RoundTargetVector).Result);
+                        }
+                    }
+                }
             }
             
+            List<FullResultDto> fullResultDtos = new List<FullResultDto>();
             foreach (Answer answer in answers)
             {
-                if (finalResultDtos.Exists(r => answer.PlayerName == r.PlayerName))
+                FullResultDto? iterFullResultDto = fullResultDtos.SingleOrDefault(r => answer.PlayerName == r.PlayerName);
+                if (iterFullResultDto != null)
                 {
-                    finalResultDtos.Find(r => r.PlayerName == answer.PlayerName).Points += answer.Points;
+                    iterFullResultDto.TotalPoints += answer.Points;
                 }
                 else
                 {
-                    finalResultDtos.Add(new FinalResultDto(answer.PlayerName, answer.Points));
+                    iterFullResultDto = new FullResultDto();
+                    iterFullResultDto.PlayerName = answer.PlayerName;
+                    iterFullResultDto.TotalPoints = answer.Points;
+                    fullResultDtos.Add(iterFullResultDto);
+                }
+
+                if (answer.RoundId == lastRound)
+                {
+                    iterFullResultDto.LastRoundPoints = answer.Points;
+                    iterFullResultDto.LastRoundAnswerTarget = answer.AnswerTarget;
                 }
             }
-            
-            finalResultDtos.Sort((a, b) => a.Points > b.Points ? -1 : 1);
-            _quizHub.SendFinalResultToGroup(quizId.ToString(), finalResultDtos);
-            return Ok(finalResultDtos);
+            // sort the fullResultDtos by points and assign the rank field according to the order
+            fullResultDtos.Sort((a, b) => a.TotalPoints > b.TotalPoints ? -1 : 1);
+            for (int i = 0; i < fullResultDtos.Count; i++)
+            {
+                fullResultDtos[i].Rank = i+1;
+            }
+            _quizHub.SendFullResultToGroup(quizId.ToString(), fullResultDtos);
+            return Ok(fullResultDtos);
         }
+
         
         [Authorize]
         [HttpGet("GetPlayers/{quizId}")]

@@ -31,9 +31,24 @@ public class AnswerService
     Representation targetRepresentation = new Representation("target", target);
     Answer answer = answerDto.toAnswer();
     answer.Id = await _answerRepository.NextAnswerId();
+    if (answerDto.Additions.Count == 0 && answerDto.Subtractions.Count == 0)
+    {
+      answer.AnswerTarget = new List<string>(){"no words were submitted"};
+      answer.Distance = 0;
+      answer.Points = 0;
+      return await _answerRepository.SaveAnswer(answer);
+    }
     answer.AnswerTarget = await _word2VectorService.WordCalculation(answerDto.Additions, answerDto.Subtractions);
     answer.Distance = await _word2VectorService.FindDistance(answer.AnswerTarget[0], targetRepresentation);
-    answer.Points = (long) ((1 + answer.Distance) / 2 * 100);
+    if (answer.Distance < -0.99)
+    {
+      answer.Points = 0;
+    }
+    else
+    {
+      answer.Points = (long) ((1 + answer.Distance) / 2 * 100);
+
+    }
     return await _answerRepository.SaveAnswer(answer);
   }
     
