@@ -64,13 +64,7 @@ namespace ToX.Controllers
             return Ok(quizzes);
         }
 
-        // ToDo: remove helper method
-        [HttpGet("GetAllRounds")]
-        public async Task<IActionResult> GetAllRounds()
-        {
-            List<RoundDto> rounds = _roundService.GetAllRounds().Result.Select(r => new RoundDto(r)).ToList();
-            return Ok(rounds);
-        }
+
         
         [HttpGet("GetAllRoundsByQuiz")]
         [Authorize]
@@ -108,15 +102,7 @@ namespace ToX.Controllers
             roundIds.Sort((a, b) => a < b ? -1 : 1);
             return Ok(roundIds);
         }
-
-        // ToDo: remove helper method
-        [HttpGet("GetAllAnswers")]
-        public async Task<IActionResult> GetAllAnswers()
-        {
-            List<Answer> answers = await _answerService.GetAllAnswers();
-            return Ok(answers);
-        }
-
+        
         [HttpPost("CreateQuiz")]
         [Authorize]
         public async Task<IActionResult> CreateQuiz([FromBody] QuizDto quizDto)
@@ -190,6 +176,33 @@ namespace ToX.Controllers
             await _quizHub.SendNextRoundToGroup(quiz.Id.ToString(), roundId.ToString());
             string response = $"Round {roundId} was broadcasted to {quiz.Id}";
             return Ok(new {response});
+        }
+        
+        [HttpGet("SendNavigate/{roundId}")]
+        [Authorize]
+        public async Task<IActionResult> NavigateResults([FromRoute] long roundId)
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
+            Round? round = await _roundService.GetRoundOrNull(roundId);
+            if (round == null)
+            {
+                return BadRequest("Round does not exist");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(round.QuizId);
+            if (quiz == null)
+            {
+                return BadRequest("Quiz does not exist");
+            }
+
+            await _quizHub.SendNavigateToGroup(quiz.Id.ToString(), roundId.ToString());
+            string response = $"Round {roundId} was broadcasted to {quiz.Id}";
+            return Ok(response);
         }
 
         [HttpPost("CreateRound")]
@@ -349,7 +362,7 @@ namespace ToX.Controllers
                     iterFullResultDto.LastRoundAnswerTarget = answer.AnswerTarget;
                 }
             }
-            // sort the fullResultDtos by points and assign the rank field according to the order
+
             fullResultDtos.Sort((a, b) => a.TotalPoints > b.TotalPoints ? -1 : 1);
             for (int i = 0; i < fullResultDtos.Count; i++)
             {
@@ -378,26 +391,6 @@ namespace ToX.Controllers
             List<string> playerNames = playerList.Select(p => p.PlayerName).ToList();
             string message = string.Join(" ", playerNames);
             return Ok(new {message});
-        }
-
-        // ToDo: remove helper method
-        [HttpGet("GetQuiz/{id}")]
-        public async Task<IActionResult> GetAllQuiz([FromRoute] long id)
-        {
-            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
-            if (claimHost == null)
-            {
-                return Unauthorized("The token could not be validated");
-            }
-            
-            Quiz? quiz = await _quizService.GetQuizOrNull(id);
-            if (quiz == null)
-            {
-                return NotFound("quiz not found");
-            }
-
-            QuizDto quizDto = new QuizDto(quiz);
-            return Ok(new { quizDto });
         }
         
         [Authorize]
@@ -459,8 +452,7 @@ namespace ToX.Controllers
             RoundDto roundDto = new RoundDto(round);
             return Ok(roundDto);
         }
-
-        //Todo: Activate authorization
+        
         [Authorize]
         [HttpPut("UpdateRound")]
         public async Task<IActionResult> ChangeRound(RoundDto roundDto)
@@ -488,7 +480,6 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(ChangeRound), returnRoundDto);
         }
         
-        //Todo: Activate authorization
         [Authorize]
         [HttpPut("UpdateQuiz")]
         public async Task<IActionResult> ChangeQuiz(QuizRoundDto quizRoundDto)
@@ -550,15 +541,6 @@ namespace ToX.Controllers
                 }
             }
             
-            // List<Round> rounds = await _roundService.GetAllRounds();
-            // foreach (Round round in rounds)
-            // {
-            //     if (_answerService.GetAnswersByRoundId(round.QuizId).Result.Count == 0)
-            //     {
-            //         _roundService.Delete(round);
-            //     }
-            // }
-            
             List<Quiz> quizzes = await _quizService.GetAllQuizzes();
             foreach (Quiz quiz in quizzes)
             {
@@ -587,28 +569,6 @@ namespace ToX.Controllers
             }
             _context.SaveChanges();
             return Ok();
-        }
-
-        // ToDo: remove helper method
-        [HttpGet("GetAnswer/{id}")]
-        public async Task<IActionResult> GetAnswer([FromRoute] long id)
-        {
-            Answer? answer = await _answerService.GetAnswerOrNull(id);
-            if (answer == null)
-            {
-                return NotFound("answer not found");
-            }
-
-            AnswerDto answerDto = new AnswerDto(answer);
-            return Ok(new { answerDto });
-        }
-        
-        // ToDo: remove helper method
-        [HttpGet("GetAnswerByQuestion/{questionId}")]
-        public async Task<IActionResult> GetAnswerByRoundId([FromRoute] long questionId)
-        {
-            List<Answer> answers = await _answerService.GetAnswersByRoundId(questionId);
-            return Ok(new {answers});
         }
     }
 }

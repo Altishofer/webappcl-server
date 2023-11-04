@@ -8,8 +8,6 @@ public class ApplicationContext : DbContext
         : base(options)
     {
     }
-    
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,7 +23,6 @@ public class ApplicationContext : DbContext
     }
     
     public DbSet<Host> Host { get; set; } = null!;
-    public DbSet<TodoItem> TodoItems { get; set; } = null!;
     public DbSet<WordVector> WordVector { get; set; } = null!;
     public DbSet<Quiz> Quiz { get; set; } = null!;    
     public DbSet<Answer> Answer { get; set; } = null!;
