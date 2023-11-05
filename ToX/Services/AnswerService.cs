@@ -33,7 +33,7 @@ public class AnswerService
     answer.Id = await _answerRepository.NextAnswerId();
     if (answerDto.Additions.Count == 0 && answerDto.Subtractions.Count == 0)
     {
-      answer.AnswerTarget = new List<string>(){"no words were submitted"};
+      answer.AnswerTarget = new List<string>(){""};
       answer.Distance = 0;
       answer.Points = 0;
       return await _answerRepository.SaveAnswer(answer);

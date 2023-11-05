@@ -305,8 +305,8 @@ namespace ToX.Controllers
         }
         
         [Authorize]
-        [HttpGet("FullResult/{quizId}")]
-        public async Task<ActionResult<FullResultDto>> GetFullResult([FromRoute] long quizId)
+        [HttpGet("FullResult/{quizId}/{roundId}")]
+        public async Task<ActionResult<FullResultDto>> GetFullResult([FromRoute] long quizId, [FromRoute] long roundId)
         {
             Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
             if (claimHost == null)
@@ -323,8 +323,12 @@ namespace ToX.Controllers
             List<Round> rounds = await _roundService.GetAllRoundsByQuiz(quizId);
             List<Answer> answers = rounds.Select((r => _answerService.GetAnswersByRoundId(r.Id).Result)).SelectMany(a => a).ToList();
             List<Player> players = await _playerService.GetPlayersByQuiz(quizId);
-            
-            long lastRound = answers.Select(a => answers.Max(a => a.RoundId)).Max();
+
+            long lastRound = roundId;
+            if (roundId == -1)
+            {
+                lastRound = answers.Select(a => answers.Max(a => a.RoundId)).Max();;
+            }
             foreach (Round roundTmp in rounds)
             {
                 if (roundTmp.Id <= lastRound)

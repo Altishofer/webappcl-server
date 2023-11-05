@@ -97,6 +97,10 @@ public class Word2VectorService
         Console.WriteLine($"'{wordA}' + '{wordB}' = ...");
         var additionRepresentation = await Task.Run(() => _vocabulary[wordA].Add(_vocabulary[wordB]));
         var closestAdditions = await Task.Run(() => _vocabulary.Distance(additionRepresentation, 1));
+        if (closestAdditions.Length == 0)
+        {
+            return _NullVector.WordOrNull;
+        }
         return closestAdditions[0].Representation.WordOrNull;
     }
 
@@ -130,7 +134,7 @@ public class Word2VectorService
         return _vocabulary
             .Distance(resultVector, 3)
             .Select(w => w.Representation.WordOrNull)
-            .Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
+            //.Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
             .ToList();
     }
 
