@@ -158,7 +158,6 @@ public class Word2VectorService
             Representation representation = _vocabulary.GetRepresentationOrNullFor(form);
             if (representation != null)
             {
-                Console.WriteLine(representation.WordOrNull);
                 return representation;
             }
         }
