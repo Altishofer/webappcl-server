@@ -26,19 +26,47 @@ public class AnswerService
     return await _answerRepository.GetAllAnswers();
   }
   
-  public async Task<Answer> CreateAnswer(AnswerDto answerDto, float[] target)
+  public async Task<Answer> CreateAnswer(AnswerDto answerDto, Round round)
   {
-    Representation targetRepresentation = new Representation("target", target);
+    Representation targetRepresentation = new Representation(round.RoundTarget, round.RoundTargetVector);
     Answer answer = answerDto.toAnswer();
     answer.Id = await _answerRepository.NextAnswerId();
+    List<string> wordsToRemove = new List<string>();
+    foreach (string wordAdd in answerDto.Additions)
+    {
+      if (wordAdd == "" || round.ForbiddenWords.Any(s => wordAdd.Contains(s)) || wordAdd.Contains(round.RoundTarget))
+      {
+        wordsToRemove.Add(wordAdd);
+      }
+    }
+    foreach (string wordSub in answerDto.Subtractions)
+    {
+      if (wordSub == "" || round.ForbiddenWords.Any(s => wordSub.Contains(s)) || wordSub.Contains(round.RoundTarget))
+      {
+        wordsToRemove.Add(wordSub);
+      }
+    }
+    foreach (string word in wordsToRemove)
+    {
+      answerDto.Additions.RemoveAll(x => x == word);
+      answerDto.Subtractions.RemoveAll(x => x == word);
+    }
+    
     if (answerDto.Additions.Count == 0 && answerDto.Subtractions.Count == 0)
     {
       answer.AnswerTarget = new List<string>(){""};
-      answer.Distance = 0;
+      answer.Distance = -1;
       answer.Points = 0;
       return await _answerRepository.SaveAnswer(answer);
     }
     answer.AnswerTarget = await _word2VectorService.WordCalculation(answerDto.Additions, answerDto.Subtractions);
+    if (answer.AnswerTarget.Count == 0)
+    {
+      answer.AnswerTarget = new List<string>(){""};
+      answer.Distance = -1;
+      answer.Points = 0;
+      return await _answerRepository.SaveAnswer(answer);
+    }
     answer.Distance = await _word2VectorService.FindDistance(answer.AnswerTarget[0], targetRepresentation);
     if (answer.Distance < -0.99)
     {

@@ -256,7 +256,7 @@ namespace ToX.Controllers
                 return BadRequest("Round does not exist");
             }
             
-            Answer answer = await _answerService.CreateAnswer(answerDto, round.RoundTargetVector);
+            Answer answer = await _answerService.CreateAnswer(answerDto, round);
             AnswerDto returnAnswerDto = new AnswerDto(answer);
             
             WaitResultDto waitResultDto = await GetWaitResultDto(answerDto.QuizId, answerDto.RoundId);
@@ -338,7 +338,7 @@ namespace ToX.Controllers
                         if (!answers.Exists(a => a.PlayerName == player.PlayerName && a.RoundId == roundTmp.Id))
                         {
                             AnswerDto answerDto = new AnswerDto(quizId, roundTmp.Id, player.PlayerName);
-                            answers.Add(_answerService.CreateAnswer(answerDto, roundTmp.RoundTargetVector).Result);
+                            answers.Add(_answerService.CreateAnswer(answerDto, roundTmp).Result);
                         }
                     }
                 }
