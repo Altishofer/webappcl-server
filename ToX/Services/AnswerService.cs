@@ -32,6 +32,8 @@ public class AnswerService
     Answer answer = answerDto.toAnswer();
     answer.Id = await _answerRepository.NextAnswerId();
     List<string> wordsToRemove = new List<string>();
+    answerDto.Additions = answerDto.Additions.ConvertAll(x => x.ToLower());
+    answerDto.Subtractions = answerDto.Subtractions.ConvertAll(x => x.ToLower());
     foreach (string wordAdd in answerDto.Additions)
     {
       if (wordAdd == "" || round.ForbiddenWords.Any(s => wordAdd.Contains(s)) || wordAdd.Contains(round.RoundTarget))

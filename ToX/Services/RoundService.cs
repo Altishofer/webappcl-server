@@ -51,6 +51,8 @@ public class RoundService
   {
     Round round = roundDto.toRound();
     round.Id = await _roundRepository.NextRoundId();
+    round.RoundTarget = round.RoundTarget.ToLower();
+    round.ForbiddenWords = round.ForbiddenWords.ConvertAll(x => x.ToLower());
     round.RoundTargetVector = await _word2VectorService.FindClosestVectorAsync(round.RoundTarget);
     return await _roundRepository.SaveRound(round);
   }
@@ -62,9 +64,9 @@ public class RoundService
   
   public async Task<Round> ChangeRound(RoundDto roundDto, Round foundRound)
   {
-    foundRound.RoundTarget = roundDto.RoundTarget;
+    foundRound.RoundTarget = roundDto.RoundTarget.ToLower();
     foundRound.RoundTargetVector = await _word2VectorService.FindClosestVectorAsync(roundDto.RoundTarget);
-    foundRound.ForbiddenWords = roundDto.ForbiddenWords;
+    foundRound.ForbiddenWords = roundDto.ForbiddenWords.ConvertAll(x => x.ToLower());
     _roundRepository.Update(foundRound);
     return foundRound;
   }

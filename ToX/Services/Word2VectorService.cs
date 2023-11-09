@@ -44,7 +44,7 @@ public class Word2VectorService
     
     public async Task<bool> IsValidWord(string word)
     {
-        return _getWordOrNullVector(word).Result.WordOrNull != "null";
+        return _getWordOrNullVector(word.ToLower()).Result.WordOrNull != "null";
     }
     
     public async Task<double> FindDistance(string word, Representation vector)
@@ -140,18 +140,31 @@ public class Word2VectorService
 
     private async Task<Representation> _getWordOrNullVector(string word)
     {
-        string[] wordForms = new string[]
+        if (word.IsNullOrEmpty())
         {
-            word, 
-            word.ToLower(),
-            char.ToUpper(word[0]) + word.Substring(1), 
-            word + "s",
-            word + "es",
-            word.ToLower() + "s",
-            char.ToUpper(word[0]) + word.Substring(1) + "es",
-            word.Substring(0, word.Length-1),
-            char.ToUpper(word[0]) + word.Substring(0, word.Length-1)
-        };
+            return new Representation("null", new float[300]);
+        }
+        
+        List<string> wordForms = new List<string>();
+        word = word.ToLower();
+
+        if (word.EndsWith("es"))
+        {
+            wordForms.Add(word.Substring(0, word.Length - 2));
+            wordForms.Add(char.ToUpper(word[0]) + word.Substring(1, word.Length - 2));
+        }
+        if (word.EndsWith("s"))
+        {
+            wordForms.Add(word.Substring(0, word.Length - 1));
+            wordForms.Add(word.Substring(0, word.Length - 1));
+        }
+        if (!word.EndsWith("s") && word.Length > 1)
+        {
+            wordForms.Add(word + "es");
+            wordForms.Add(word + "s");
+            wordForms.Add(char.ToUpper(word[0]) + word.Substring(1) + "s");
+            wordForms.Add(char.ToUpper(word[0]) + word.Substring(1) + "es");
+        }
     
         foreach (string form in wordForms)
         {
