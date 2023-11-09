@@ -25,10 +25,6 @@ This project aims to create a dynamic and engaging learning experience for parti
 - Docker for containerization for local development and stable deployment to Dokku
 - Microsoft Entity Framework for leveraged object oriented programming with a database mapper
 
-- Responsive and intuitive user interface crafted using Angular implemented in TypeScript while always trying to use best practices
-- Encrypted password submission and Bearer token rotation using JWT for each request to increase security
-- Real time communication between Players and Hosts with Websockets and RESTful APIs
-
 ---
 
 ### Prerequisites
