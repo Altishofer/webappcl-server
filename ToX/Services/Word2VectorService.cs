@@ -146,7 +146,11 @@ public class Word2VectorService
         }
         
         List<string> wordForms = new List<string>();
-        word = word.ToLower();
+        wordForms.Add(word.ToLower());
+        if (word.Length > 1)
+        {
+            wordForms.Add(char.ToUpper(word[0]) + word.Substring(1));
+        }
 
         if (word.EndsWith("es"))
         {
