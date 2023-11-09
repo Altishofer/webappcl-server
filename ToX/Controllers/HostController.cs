@@ -61,11 +61,11 @@ namespace ToX.Controllers
             }
 
             Host? authHost = await _hostService.GetHostOrNull(hostDto);
-            if (authHost == null)
+            if (authHost == null || authHost.hostPassword != hostDto.hostPassword)
             {
                 return Unauthorized("User with given credentials was not found");
             }
-            
+
             return Ok(new {token = _hostService.GenerateToken(hostDto), id = authHost.hostId});
         }
         
