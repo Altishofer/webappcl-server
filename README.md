@@ -67,14 +67,14 @@ Follow these steps to set up the project:
    "VECTOR_BIN": "./GoogleNews-vectors-negative300.bin"
    }
     ```
-### Installation & run with .NET SDK
-4. Build & start the web server:
+
+5. Build & start the web server:
 
    ```shell
    dotnet run --launch-profile http --environment Development --project ToX
    ```
 
-5. Open your favorite browser and have a look at Swagger! 🎉
+6. Open your favorite browser and have a look at Swagger! 🎉
    ```shell
    http://localhost:5072/swagger/index.html
    ```
