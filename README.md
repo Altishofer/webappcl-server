@@ -83,14 +83,20 @@ Follow these steps to set up the project:
 ### Simulate remote deployment on Dokku
 Verify build with Docker to simulate Dokku deployment
 1. Make sure Docker Desktop is running
+2. Open Powershell in repository directory
 
-2. Build the docker image
+3. Build the docker image
 ```shell
 docker build -t webappcl-server:latest .
   ```
 
-3. Deploy the docker image
+4. Deploy the docker image
 
 ```shell
 docker run -d -p 5000:5000 --name webappcl-server webappcl-server:latest
 ```
+
+5. Open browser to check the deployment
+  ```shell
+http://localhost:5000/
+   ```
