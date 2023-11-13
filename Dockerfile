@@ -22,10 +22,10 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-WORKDIR /
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates curl
-RUN curl -L -o vectors.bin -v 'https://dwqi5g.db.files.1drv.com/y4migN20BQnc2f-AKEJKebqTVQxpuOTU-sLP3maLnrkCNbZxn8a68konTe2PWnutfgYoMETHmY6jVKbO6KZ2ODVsn1V2EhzJyu_qAMYo-DmP7fD3gAhVR1IJbsq2n3Xz8i0JAvODZu9lR0TJWtQnARqcCmNvBjqABwID6P9HEexEay6VNcfai4i4eu5tbQ4jNaOnfRlVIAeOVOzZ_x8tyaxyA' 
-ENV VECTOR_BIN=/vectors.bin
+#WORKDIR /
+#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates curl
+#RUN curl -L -o vectors.bin -v 'https://dwqi5g.db.files.1drv.com/y4migN20BQnc2f-AKEJKebqTVQxpuOTU-sLP3maLnrkCNbZxn8a68konTe2PWnutfgYoMETHmY6jVKbO6KZ2ODVsn1V2EhzJyu_qAMYo-DmP7fD3gAhVR1IJbsq2n3Xz8i0JAvODZu9lR0TJWtQnARqcCmNvBjqABwID6P9HEexEay6VNcfai4i4eu5tbQ4jNaOnfRlVIAeOVOzZ_x8tyaxyA' 
+#ENV VECTOR_BIN=/vectors.bin
 
 WORKDIR /app
 ENTRYPOINT ["dotnet", "ToX.dll", "--urls", "http://0.0.0.0:5000", "--host", "0.0.0.0", "--port", "5000"]
