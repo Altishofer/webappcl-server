@@ -41,13 +41,6 @@ namespace ToX.Controllers
             _playerService = new PlayerService(_context, _config);
             _quizHub = new QuizHub(hubContext);
         }
-
-        [HttpGet("GetAllQuizzes")]
-        public async Task<IActionResult> GetAllQuizzes()
-        {
-            List<Quiz> quizzes = await _quizService.GetAllQuizzes();
-            return Ok(quizzes);
-        }
         
         [HttpGet("GetAllQuizzesByHost")]
         [Authorize]
@@ -63,7 +56,6 @@ namespace ToX.Controllers
             quizzes.Sort((a, b) => a.Id < b.Id ? -1 : 1);
             return Ok(quizzes);
         }
-
 
         
         [HttpGet("GetAllRoundsByQuiz")]

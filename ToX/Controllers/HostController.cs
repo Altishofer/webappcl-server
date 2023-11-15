@@ -22,17 +22,6 @@ namespace ToX.Controllers
             _hostService = new HostService(_context, _configuration);
         }
         
-        // GET: api/Host/GetHosts
-        [HttpGet("GetHosts")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetHosts()
-        {
-            List<Host> hostList = await _hostService.GetAllHosts();
-            List<ReturnHostDtoDebug> hostDTOs = hostList.Select(host => new ReturnHostDtoDebug(host)).ToList();
-            return Ok(hostDTOs);
-        }
-        
-        // POST: api/Host/Register
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterHostDTO hostDTO)
@@ -50,7 +39,6 @@ namespace ToX.Controllers
             return CreatedAtAction(nameof(Register), new {token = _hostService.GenerateToken(hostDTO), id = host.hostId }); 
         }
         
-        // POST: api/Host/Login
         [HttpPost("Login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] RegisterHostDTO hostDto)
@@ -69,7 +57,6 @@ namespace ToX.Controllers
             return Ok(new {token = _hostService.GenerateToken(hostDto), id = authHost.hostId});
         }
         
-        // POST: api/Host/RefreshToken
         [HttpGet("RefreshToken")]
         [Authorize]
         public async Task<IActionResult> RefreshToken()

@@ -37,9 +37,8 @@ namespace ToX.Controllers
             _word2VectorService = Word2VectorService.GetInstance(_context, _config);
         }
         
-        // GET: api/Word2Vector/status
-        [HttpGet("status")]
         [AllowAnonymous]
+        [HttpGet("status")]
         public async Task<ActionResult>  GetStatus()
         {
             int length;
@@ -73,43 +72,15 @@ namespace ToX.Controllers
             });
         }
         
-        [HttpGet("validate/{word}")]
         [AllowAnonymous]
+        [HttpGet("validate/{word}")]
         public async Task<IActionResult> CheckValidity([FromRoute] string word)
         {
             bool isValid = await _word2VectorService.IsValidWord(word);
             return Ok(isValid);
         }
-
-        [HttpGet("closestWords/{word}/{count}")]
+        
         [AllowAnonymous]
-        public async Task<IActionResult> GetClosestWords([FromRoute] string word, [FromRoute] int count)
-        {
-            var closestWords = await _word2VectorService.FindClosestWordsAsync(word, count);
-            return Ok(closestWords);
-        }
-        
-        [HttpGet("analogy")]
-        public async Task<IActionResult> GetAnalogy(string wordA, string wordB, string wordC, int count)
-        {
-            var analogyWords = await _word2VectorService.AnalogyAsync(wordA, wordB, wordC, count);
-            return Ok(analogyWords);
-        }
-
-        [HttpGet("wordAddition")]
-        public async Task<IActionResult> GetWordAddition(string wordA, string wordB)
-        {
-            var additionWords = await _word2VectorService.WordAdditionAsync(wordA, wordB);
-            return Ok(additionWords);
-        }
-
-        [HttpGet("wordSubtraction")]
-        public async Task<IActionResult> GetWordSubtraction(string wordA, string wordB)
-        {
-            var subtractionWords = await _word2VectorService.WordSubtractionAsync(wordA, wordB);
-            return Ok(subtractionWords);
-        }
-        
         [HttpPut("wordCalculation")]
         public async Task<IActionResult> GetWordSubtraction([FromBody] VectorCalculationDto vecCalcDto)
         {

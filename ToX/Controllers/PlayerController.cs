@@ -35,7 +35,6 @@ namespace ToX.Controllers
             _quizHub = new QuizHub(hubContext);
         }
         
-        // POST: api/Player/Register
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterPlayerDto registerPlayerDto)
@@ -54,16 +53,6 @@ namespace ToX.Controllers
             await _quizHub.SendPlayersToGroup(registerPlayerDto.QuizId.ToString(), message);
 
             return Ok(_playerService.GenerateToken(registerPlayerDto));
-        }
-        
-        // Get: api/Player
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllPlayers()
-        {
-            List <Player> players = await _playerService.GetAllPlayers();
-            List <ReturnPlayerDto>  returnPlayersDto = players.Select(p => new ReturnPlayerDto(p)).ToList();
-            return CreatedAtAction(nameof(Register), returnPlayersDto);
         }
     }
 }
