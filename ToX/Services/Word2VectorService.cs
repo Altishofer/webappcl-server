@@ -44,13 +44,13 @@ public class Word2VectorService
     
     public async Task<bool> IsValidWord(string word)
     {
-        return _getWordOrNullVector(word.ToLower()).Result.WordOrNull != "null";
+        return _getWordOrNullVector(word.ToLower()).Result != _NullVector;
     }
     
     public async Task<double> FindDistance(string word, Representation vector)
     {
         Representation vectorB = await _getWordOrNullVector(word);
-        if (vectorB.WordOrNull == "null")
+        if (vectorB == _NullVector)
         {
             return -1;
         }
@@ -130,6 +130,11 @@ public class Word2VectorService
                 resultVector = await _subtWordFromVector(word, resultVector);
             }
         }
+        
+        if (resultVector == _NullVector)
+        {
+            return new List<string>();
+        }
 
         return _vocabulary
             .Distance(resultVector, 3)
@@ -142,7 +147,7 @@ public class Word2VectorService
     {
         if (word.IsNullOrEmpty())
         {
-            return new Representation("null", new float[300]);
+            return _NullVector;
         }
         
         List<string> wordForms = new List<string>();
@@ -178,12 +183,12 @@ public class Word2VectorService
                 return representation;
             }
         }
-        return new Representation("null", new float[300]);
+        return _NullVector;
     }
     
     private async Task<Representation> _addWordToVector(string word, Representation vectorB)
     {
-        Representation? vectorA = await _getWordOrNullVector(word);
+        Representation vectorA = await _getWordOrNullVector(word);
         if (vectorA == _NullVector)
         {
             return vectorB;

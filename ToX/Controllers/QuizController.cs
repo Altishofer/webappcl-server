@@ -359,7 +359,7 @@ namespace ToX.Controllers
                 }
             }
 
-            fullResultDtos.Sort((a, b) => a.TotalPoints > b.TotalPoints ? -1 : 1);
+            fullResultDtos = fullResultDtos.OrderByDescending(a => a.TotalPoints).ThenByDescending(b => b.LastRoundPoints).ToList();
             for (int i = 0; i < fullResultDtos.Count; i++)
             {
                 fullResultDtos[i].Rank = i+1;
