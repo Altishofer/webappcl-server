@@ -522,6 +522,46 @@ namespace ToX.Controllers
             QuizRoundDto quizRoundDtoNew = await GetQuizRoundDto(quizRoundDto.QuizId);
             return CreatedAtAction(nameof(ChangeQuiz), quizRoundDtoNew);
         }
+        
+        [Authorize]
+        [HttpDelete("DeleteCompleteQuiz/{quizId}")]
+        public async Task<IActionResult> DeleteCompleteQuiz([FromRoute] long quizId)
+        {
+            Host? claimHost = await _hostService.VerifyHost(HttpContext.User);
+            if (claimHost == null)
+            {
+                return Unauthorized("The token could not be validated");
+            }
+            
+            Quiz? quiz = await _quizService.GetQuizOrNull(quizId);
+            if (quiz == null)
+            {
+                return NotFound("quiz not found");
+            }
+            
+            List<long> roundIds = _roundService.GetAllRoundsByQuiz(quiz.Id).Result.Select(r => r.Id).ToList();
+            List<Player> players = await _playerService.GetPlayersByQuiz(quiz.Id);
+            List<Answer> answers = new List<Answer>();
+            foreach (long roundId in roundIds)
+            {
+                answers.AddRange(_answerService.GetAnswersByRoundId(roundId).Result);
+                await _roundService.Delete(roundId);
+            }
+
+            foreach (Answer answer in answers)
+            {
+                _answerService.Delete(answer);
+            }
+
+            foreach (Player player in players)
+            {
+                _playerService.Delete(player);
+            }
+            
+            _quizService.Delete(quiz);
+            _context.SaveChanges();
+            return Ok();
+        }
 
         
         // ToDo: remove helper method
