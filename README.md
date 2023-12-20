@@ -32,6 +32,7 @@ This project aims to create a dynamic and engaging learning experience for parti
 Before getting started, make sure you have the following prerequisites:
 
 - [.NET 7.0](https://dotnet.microsoft.com/en-us/download)
+- [.NET Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-7.0.14-windows-x64-installer)
 - [Angular](https://angular.io/)
 - [Docker](https://www.docker.com/)
 
