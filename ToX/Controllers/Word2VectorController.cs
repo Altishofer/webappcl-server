@@ -1,24 +1,8 @@
-﻿using System;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToX.DTOs;
 using ToX.Models;
-using ToX.Repositories;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using ToX.DTOs.VectorDto;
-using ToX.Models;
-using ToX.Services;
 using Word2vec.Tools;
-using Word2vec = ToX.Models.WordVector;
 
 namespace ToX.Controllers
 {
@@ -82,9 +66,12 @@ namespace ToX.Controllers
         
         [AllowAnonymous]
         [HttpPut("wordCalculation")]
-        public async Task<IActionResult> GetWordSubtraction([FromBody] VectorCalculationDto vecCalcDto)
+        public async Task<IActionResult> GetWordCalcDebug([FromBody] VectorCalculationDto vecCalcDto)
         {
-            return Ok(await _word2VectorService.WordCalculation(vecCalcDto.Additions, vecCalcDto.Subtractions));
+            List<string> result =
+                await _word2VectorService.WordCalculation(vecCalcDto.Additions, vecCalcDto.Subtractions);
+            result = result.Take(3).ToList();
+            return Ok(result);
         }
         
     }

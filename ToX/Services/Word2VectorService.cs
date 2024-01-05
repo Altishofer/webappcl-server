@@ -57,18 +57,6 @@ public class Word2VectorService
         return vectorB.GetCosineDistanceTo(vector).DistanceValue;
     }
     
-    public async Task<List<string>> FindClosestWordsAsync(string word, int count)
-    {
-        Console.WriteLine($"top {count} closest to '{word}' words:");
-        var closest = await Task.Run(() => _vocabulary.Distance(word, count));
-        var result = new List<string>();
-        foreach (var neighbor in closest)
-        {
-            result.Add(neighbor.Representation.WordOrNull);
-        }
-        return result;
-    }
-    
     public async Task<float[]> FindClosestVectorAsync(string word)
     {
         Representation vector = await _getWordOrNullVector(word);
@@ -80,38 +68,6 @@ public class Word2VectorService
         return closest[0].Representation.NumericVector;
     }
 
-    public async Task<List<WordVector>> AnalogyAsync(string wordA, string wordB, string wordC, int count)
-    {
-        Console.WriteLine($"'{wordA}' relates to '{wordB}' as '{wordC}' relates to ...");
-        var analogies = await Task.Run(() => _vocabulary.Analogy(wordA, wordB, wordC, count));
-        var result = new List<WordVector>();
-        foreach (var neighbor in analogies)
-        {
-            result.Add(new WordVector(neighbor.Representation.WordOrNull, neighbor.Representation.NumericVector));
-        }
-        return result;
-    }
-
-    public async Task<string> WordAdditionAsync(string wordA, string wordB)
-    {
-        Console.WriteLine($"'{wordA}' + '{wordB}' = ...");
-        var additionRepresentation = await Task.Run(() => _vocabulary[wordA].Add(_vocabulary[wordB]));
-        var closestAdditions = await Task.Run(() => _vocabulary.Distance(additionRepresentation, 1));
-        if (closestAdditions.Length == 0)
-        {
-            return _NullVector.WordOrNull;
-        }
-        return closestAdditions[0].Representation.WordOrNull;
-    }
-
-    public async Task<string> WordSubtractionAsync(string wordA, string wordB)
-    {
-        Console.WriteLine($"'{wordA}' - '{wordB}' = ...");
-        Representation subtractionRepresentation = await Task.Run(() => _vocabulary[wordA].Substract(_vocabulary[wordB]));
-        DistanceTo[] closestSubtractions = await Task.Run(() => _vocabulary.Distance(subtractionRepresentation,1));
-        return closestSubtractions[0].Representation.WordOrNull;
-    }
-
     public async Task<List<string>> WordCalculation(List<string> addList, List<string> subList)
     {
         Representation resultVector = _NullVector;
@@ -120,6 +76,7 @@ public class Word2VectorService
             foreach (string word in addList)
             {
                 resultVector = await _addWordToVector(word, resultVector);
+                // Console.WriteLine(_vocabulary.Distance(resultVector, 1).ToList()[0].Representation.WordOrNull);
             }
         }
         
@@ -128,6 +85,7 @@ public class Word2VectorService
             foreach (string word in subList)
             {
                 resultVector = await _subtWordFromVector(word, resultVector);
+                // Console.WriteLine(_vocabulary.Distance(resultVector, 1).ToList()[0].Representation.WordOrNull);
             }
         }
         
@@ -137,9 +95,9 @@ public class Word2VectorService
         }
 
         return _vocabulary
-            .Distance(resultVector, 3)
+            .Distance(resultVector, 10)
             .Select(w => w.Representation.WordOrNull)
-            //.Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
+            .Where(w => !addList.Any(e => e == w) && !subList.Any(e => e == w))
             .ToList();
     }
 

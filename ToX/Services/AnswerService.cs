@@ -62,6 +62,7 @@ public class AnswerService
       return await _answerRepository.SaveAnswer(answer);
     }
     answer.AnswerTarget = await _word2VectorService.WordCalculation(answerDto.Additions, answerDto.Subtractions);
+    answer.AnswerTarget = answer.AnswerTarget.Take(3).ToList();
     if (answer.AnswerTarget.Count == 0)
     {
       answer.AnswerTarget = new List<string>(){""};
