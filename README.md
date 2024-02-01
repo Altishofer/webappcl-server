@@ -101,3 +101,35 @@ docker run -d -p 5000:5000 --name webappcl-server webappcl-server:latest
   ```shell
 http://localhost:5000/
    ```
+
+
+### Impressions from POV of Host
+
+#### Registering
+<img src="images/hostViewLogin.png"/>
+
+#### home-screen
+<img src="images/hostViewHome.png"/>
+
+#### Quiz overview
+<img src="images/hostViewSelectQuizzes.png"/>
+
+#### host view while creating a quiz
+<img src="images/hostViewCreateGame.png"/>
+
+#### Lobby
+<img src="images/hostViewLobby.png"/>
+
+#### host view during game play
+<img src="images/hostViewGamePlay.png"/>
+
+#### Pedestal
+<img src="images/HostViewPedestal.png"/>
+
+### Impressions from POV of Player
+
+#### login screen
+<img src="images/registerPlayer.png"/>
+
+#### game play
+<img src="images/gamePlayPlayer3.png"/>
